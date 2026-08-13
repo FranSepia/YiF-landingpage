@@ -1,0 +1,31 @@
+Copyright (c) 2026 Y&F Group. Todos los derechos reservados.
+
+Este repositorio contiene el sitio web de Y&iF (why-and-if.solutions): su
+código, diseño, textos, imágenes, videos, marcas y logotipos. Todo ello es
+propiedad de Y&F Group y NO se publica bajo una licencia de código abierto.
+
+Que el repositorio sea visible públicamente no otorga ningún permiso de uso.
+Salvo autorización escrita de Y&F Group, no se permite copiar, redistribuir,
+modificar, ni usar este material — total o parcialmente — para crear sitios,
+plantillas o productos derivados.
+
+Se permite, sin autorización previa:
+  · leer el código y estudiarlo;
+  · citarlo con fines educativos o de crítica, dando atribución.
+
+----------------------------------------------------------------------------
+
+COMPONENTES DE TERCEROS
+
+Este repositorio incluye librerías y fuentes de terceros que SÍ tienen su
+propia licencia libre, y que se rigen por ella y no por este aviso. Sus
+avisos de copyright completos están en THIRD-PARTY-NOTICES.md y deben
+conservarse en cualquier copia o redistribución:
+
+  · WebGL-Fluid-Simulation — © 2017 Pavel Dobryakov — MIT
+  · jQuery                 — © OpenJS Foundation      — MIT
+  · Splide                 — © Naotoshi Fujita        — MIT
+  · Swiper                 — © Vladimir Kharlampidi   — MIT
+  · Montserrat, Bitter     — SIL Open Font License 1.1
+
+Contacto: contacto@why-and-if.solutions
