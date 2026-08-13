@@ -1,0 +1,24 @@
+# Netlify sirve automáticamente /contacto desde contacto.html ("Pretty URLs").
+# Este archivo deja el directorio publicado explícito por si conectas el repo.
+[build]
+  publish = "."
+
+# Fuerza HTTPS y cabeceras razonables (opcional).
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Las tarjetas se movieron a /tarjetas/<nombre>. Estos 301 mantienen vivas las
+# URLs viejas (QR ya impresos, links compartidos). No los borres.
+[[redirects]]
+  from = "/tarjeta-digital"
+  to = "/tarjetas/y-and-if"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tarjeta-digital-humberto-gonzalez-olmos"
+  to = "/tarjetas/humberto-gonzalez-olmos"
+  status = 301
+  force = true

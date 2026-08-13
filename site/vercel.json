@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/tarjeta-digital",
+      "destination": "/tarjetas/y-and-if",
+      "permanent": true
+    },
+    {
+      "source": "/tarjeta-digital-humberto-gonzalez-olmos",
+      "destination": "/tarjetas/humberto-gonzalez-olmos",
+      "permanent": true
+    }
+  ]
+}

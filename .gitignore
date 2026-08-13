@@ -1,0 +1,23 @@
+# Basura del sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Python (los scripts de _work/)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Artefactos de despliegue
+.vercel/
+.netlify/
+node_modules/
