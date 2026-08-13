@@ -1,6 +1,6 @@
 # Duplicado Landing Page Y&iF — copia estática
 
-Copia estática y auto-contenida del sitio **https://www.why-and-if.solutions/** (originalmente en Webflow, plan gratuito), lista para desplegar en **Vercel / Netlify / Cloudflare Pages** sin depender de Webflow ni de ningún CDN externo.
+Copia estática y auto-contenida del sitio **https://www.why-and-if.solutions/** (originalmente en Webflow, plan gratuito), lista para desplegar en **Cloudflare Pages** (con el formulario de contacto funcionando vía Pages Functions + D1) o, sin el formulario, en Vercel/Netlify — sin depender de Webflow ni de ningún CDN externo.
 
 Fecha de clonado: **2026-08-12** · Último publicado del original: *Tue May 19 2026*.
 
@@ -35,6 +35,9 @@ Duplicado Landing Page Y&iF/
 │   │   └── tarjetas/         ← una carpeta por tarjeta
 │   │       ├── y-and-if/                 (3 img + 2 video)
 │   │       └── humberto-gonzalez-olmos/  (16 img + 2 video)
+│   │   └── contacto/js/      ← contact-form.js (envía el form a /api/contact)
+│   ├── functions/
+│   │   └── api/contact.js    ← Cloudflare Pages Function: guarda el lead en D1 + avisa por correo
 │   ├── favicon.ico
 │   ├── robots.txt
 │   ├── sitemap.xml
@@ -44,8 +47,11 @@ Duplicado Landing Page Y&iF/
 │   ├── localize.py           ← baja el sitio original y genera /site (plano)
 │   ├── reorganize.py         ← reparte /site/assets en carpetas por página
 │   ├── serve_nocache.py      ← servidor local sin caché
+│   ├── d1/schema.sql         ← esquema de la tabla `leads` (formulario de contacto)
 │   ├── _raw/                 ← HTML original descargado de cada página
 │   └── _watercolor_script.txt← script del efecto de acuarela (referencia)
+├── LICENSE                    ← propiedad de Y&F Group, no es open source
+├── THIRD-PARTY-NOTICES.md     ← avisos MIT/OFL de las librerías incluidas
 └── README.md
 ```
 
@@ -100,9 +106,9 @@ En los tres casos, **la carpeta a publicar es `site/`** (no la raíz del proyect
 
 | Plataforma | Cómo |
 |---|---|
-| **Vercel** | Arrastra `site/` en vercel.com/new, o `cd site && vercel`. El `vercel.json` ya activa URLs limpias. |
-| **Netlify** | Arrastra `site/` en app.netlify.com/drop, o conecta el repo con *publish directory* = `site`. Netlify sirve `/contacto` desde `contacto.html` automáticamente. |
-| **Cloudflare Pages** | Sube `site/` como proyecto de "assets directos"; sirve extensiones limpias por defecto. |
+| **Cloudflare Pages** (la que se usa hoy) | Conecta el repo de GitHub, *build output directory* = `site`. Trae **URLs limpias** por defecto y sirve `site/functions/api/contact.js` automáticamente (la función del formulario de contacto). Ver el paso a paso completo en la sección del formulario, más abajo. |
+| **Vercel** | Arrastra `site/` en vercel.com/new, o `cd site && vercel`. El `vercel.json` ya activa URLs limpias. El formulario de contacto **no funciona aquí tal cual** — está escrito como Cloudflare Pages Function + D1; en Vercel habría que reescribirlo como Vercel Function + otra base de datos. |
+| **Netlify** | Arrastra `site/` en app.netlify.com/drop, o conecta el repo con *publish directory* = `site`. Netlify sirve `/contacto` desde `contacto.html` automáticamente. Mismo caso: el formulario necesitaría reescribirse como Netlify Function. |
 
 Después apunta tu dominio **why-and-if.solutions** al nuevo host (registro DNS) y listo.
 
@@ -122,19 +128,56 @@ Después apunta tu dominio **why-and-if.solutions** al nuevo host (registro DNS)
 
 ## 🔁 Qué requirió sustitución o atención
 
-### 1. Formulario de contacto (`contacto.html`) — **acción tuya pendiente**
-El formulario `email-form` (campos: *Name, Email, Empresa, Solución Solicitada, pref, Más Información*) enviaba a los servidores de **Webflow**, que ya no existirán. Ahora mismo el formulario se ve idéntico pero **no envía nada**.
+### 1. Formulario de contacto (`contacto.html`) — resuelto, corre en Cloudflare Pages
 
-**Recomendado — Formspree** (funciona en Vercel, Netlify y Cloudflare):
-1. Crea un formulario gratis en https://formspree.io y copia tu endpoint (`https://formspree.io/f/xxxxxx`).
-2. En `contacto.html`, en la etiqueta `<form ... class="..." >`, añade:
-   ```html
-   action="https://formspree.io/f/xxxxxx" method="POST"
+El formulario `email-form` enviaba a los servidores de **Webflow**, que ya no existen. Se reemplazó por una **Cloudflare Pages Function** propia: `site/functions/api/contact.js`, que guarda cada envío en **D1** (la base SQL de Cloudflare) y opcionalmente avisa por correo vía **Resend**. Cero servicios de terceros que cobren, cero límite de envíos/mes.
+
+Cómo quedó armado (para que sepas qué tocar si algo cambia):
+
+- El wrapper del formulario dejó de tener la clase `w-form` (ahora es `yif-form`) — así el runtime de Webflow ya no intenta interceptar el submit y mandarlo a `webflow.com`, que es lo que causaba el "Oops! Something went wrong" cuando lo probaste antes.
+- `site/assets/contacto/js/contact-form.js` intercepta el submit, arma un `FormData` y hace `fetch` a `/api/contact`. Muestra el mismo mensaje de éxito/error que ya traía el diseño (`.w-form-done` / `.w-form-fail`), no se ve nada distinto.
+- Lleva un campo trampa para bots (`name="website"`, oculto con CSS). Si un bot lo rellena, se le responde "éxito" sin guardar nada — spam invisible, sin CAPTCHA.
+- Si JavaScript está desactivado, el `<form method="post" action="/api/contact">` igual funciona (Cloudflare sabe leer tanto `multipart/form-data` como el POST nativo del navegador), aunque sin el mensaje dinámico.
+
+**Para activarlo en tu cuenta de Cloudflare, antes del primer deploy:**
+
+1. **Crea la base D1** (una nueva, dedicada a este sitio — no mezcles con la de tu otro proyecto):
+   ```bash
+   npx wrangler login
+   npx wrangler d1 create yif-landingpage-leads
+   ```
+   Te va a imprimir un `database_id`; guárdalo, lo pides en el paso 3.
+
+2. **Aplica el esquema** (crea la tabla `leads`):
+   ```bash
+   npx wrangler d1 execute yif-landingpage-leads --remote --file=_work/d1/schema.sql
    ```
 
-**Alternativa — Netlify Forms** (solo si despliegas en Netlify): añade `method="POST" data-netlify="true"` al `<form>` y un `<input type="hidden" name="form-name" value="email-form">` como primer campo.
+3. **Conecta el repo en Cloudflare Pages** (dashboard → Workers & Pages → Create → Pages → conecta `FranSepia/YiF-landingpage`):
+   - *Build output directory*: `site`
+   - *Build command*: (vacío, es HTML estático)
+   - En **Settings → Functions → D1 database bindings**: variable `DB` → tu base `yif-landingpage-leads`.
 
-Mientras tanto, el contacto sigue disponible por los datos del pie: **contacto@why-and-if.solutions**, **55 4748 0723** y los botones de **WhatsApp**.
+4. **(Opcional pero recomendado) Aviso por correo con Resend:**
+   - Crea una cuenta gratis en https://resend.com y copia tu API key (100 correos/día gratis).
+   - En **Settings → Environment variables**, agrega `RESEND_API_KEY` como **Secret**.
+   - Sin verificar tu dominio en Resend, el correo sale desde `onboarding@resend.dev` — funciona perfecto porque es solo un aviso interno para ustedes, no algo que vea el cliente. Si más adelante quieres que salga de `@why-and-if.solutions`, verificas el dominio en Resend y cambias la variable opcional `NOTIFY_FROM`.
+   - Si no configuras `RESEND_API_KEY`, el formulario sigue funcionando igual — el lead se guarda en D1, simplemente no llega el correo.
+
+**Cómo revisar los leads que van llegando:**
+```bash
+npx wrangler d1 execute yif-landingpage-leads --remote --command "SELECT * FROM leads ORDER BY created_at DESC"
+```
+O desde el dashboard: Workers & Pages → D1 → `yif-landingpage-leads` → pestaña *Tables*.
+
+**Probarlo en tu máquina antes de subir cambios** (sin tocar tu cuenta real de Cloudflare, usa una base D1 local de prueba):
+```bash
+cd site
+npx wrangler pages dev . --d1 DB=test-local
+```
+Abre `http://127.0.0.1:8788/contacto`, llena el formulario y mándalo. Para darle datos a esa base local, corre el mismo `wrangler d1 execute ... --local --file=...` sin `--remote`.
+
+Mientras tanto, el contacto sigue disponible también por los datos del pie: **contacto@why-and-if.solutions**, **55 4748 0723** y los botones de **WhatsApp**.
 
 ### 2. Badge "Made in Webflow" — **opcional**
 El original (plan gratuito) inyecta el badge "Made in Webflow" abajo a la derecha. Para mantener la copia idéntica y sin dependencias, se **descargaron sus 2 SVG** y se parchó el JS para servirlos localmente. Como ya no usas Webflow, **puedes quitarlo**: en `assets/shared/js/webflow.schunk.46f2c06d4a0bdbdb.js` está el código que lo crea (busca `w-webflow-badge`), o simplemente añade en tu CSS `.w-webflow-badge{display:none!important}`.

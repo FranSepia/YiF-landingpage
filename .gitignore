@@ -20,4 +20,5 @@ venv/
 # Artefactos de despliegue
 .vercel/
 .netlify/
+.wrangler/
 node_modules/
