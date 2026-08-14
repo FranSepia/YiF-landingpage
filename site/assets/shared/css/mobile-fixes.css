@@ -1,0 +1,85 @@
+/* ============================================================================
+   Y&iF — Correcciones de layout en móvil
+   ----------------------------------------------------------------------------
+   Todo aquí vive dentro de @media (max-width:767px), así que el escritorio
+   queda exactamente como estaba. Cárgalo DESPUÉS del CSS principal de Webflow
+   para que estas reglas ganen en la cascada.
+   ============================================================================ */
+
+@media screen and (max-width: 767px) {
+
+  /* --- Scroll horizontal fantasma -----------------------------------------
+     .header-t ya mide el 100% del ancho disponible, y encima traía left:40px,
+     que lo empuja 40px a la derecha SIN reducir su ancho. Resultado: 40px que
+     se salen de la pantalla y dejan ese espacio muerto a la derecha.
+     La sangría se consigue con padding (que sí va por dentro) en vez de left. */
+  .header-t {
+    left: 0;
+    margin-left: 0;
+    padding-left: 40px;
+    box-sizing: border-box;
+  }
+
+  /* Red de seguridad: si algún elemento suelto se pasa de ancho, se recorta en
+     vez de generar scroll lateral. No usa overflow:hidden en <html> para no
+     romper `position:sticky` ni el scroll vertical. */
+  body {
+    overflow-x: clip;
+  }
+
+  /* --- Footer -------------------------------------------------------------
+     Traía translateY(150px) para compensar un desplazamiento falso del
+     contenido, y sus columnas colapsaban a ~0px de alto (son flex-item y
+     flex-container a la vez). Se saca todo del flex y se apila en bloque. */
+  .section-23.footersoluciones,
+  .section-24.footercontacto {
+    position: static;
+    transform: none;
+    height: auto;
+  }
+  .footersoluciones .w-container,
+  .footercontacto .w-container {
+    display: block;
+    height: auto;
+  }
+  .footersoluciones .columns-6,
+  .footercontacto .columns-7 {
+    display: block;
+  }
+  .footersoluciones .w-col,
+  .footercontacto .w-col {
+    width: 100%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  /* el renglón de la dirección salía del flujo con bottom:-200px */
+  .footercontacto .text-block-19 {
+    position: static;
+    bottom: auto;
+  }
+
+  /* --- "Lo que nos mueve": tarjetas Misión / Our Why / Visión --------------
+     Las tres se forzaban en fila (flex-direction:row) incluso en celular, y
+     quedaban de ~97px de ancho: el título se partía letra por letra en
+     vertical ("M i s i ó n"). En móvil se apilan una debajo de otra.
+     Lleva !important porque la regla row vive en un <style> más abajo del
+     documento y, a igualdad de especificidad, esa ganaría por orden. */
+  .benefits_layout {
+    flex-direction: column !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  .benefits_card_wrap {
+    width: 100%;
+    height: 200px;
+    min-height: 200px;
+  }
+  /* El título va en vertical (writing-mode: vertical-rl) porque en escritorio
+     las tarjetas son columnas angostas. Apiladas a lo ancho en celular, el
+     texto tiene que leerse en horizontal. */
+  .benefits_card_title {
+    writing-mode: horizontal-tb !important;
+    letter-spacing: normal;
+    line-height: 1.1;
+  }
+}
