@@ -937,8 +937,9 @@ window.addEventListener('mouseup', function () {
     updatePointerUpData(pointers[0]);
 });
 
+// Y&iF: sin preventDefault() — el canvas cubre toda la pantalla de home y
+// bloquear el touchmove aquí impedía hacer scroll con el dedo en móvil.
 canvas.addEventListener('touchstart', function (e) {
-    e.preventDefault();
     var touches = e.targetTouches;
     while (touches.length >= pointers.length)
         { pointers.push(new pointerPrototype()); }
@@ -947,10 +948,9 @@ canvas.addEventListener('touchstart', function (e) {
         var posY = scaleByPixelRatio(touches[i].pageY);
         updatePointerDownData(pointers[i + 1], touches[i].identifier, posX, posY);
     }
-});
+}, { passive: true });
 
 canvas.addEventListener('touchmove', function (e) {
-    e.preventDefault();
     var touches = e.targetTouches;
     for (var i = 0; i < touches.length; i++) {
         var pointer = pointers[i + 1];
@@ -959,7 +959,7 @@ canvas.addEventListener('touchmove', function (e) {
         var posY = scaleByPixelRatio(touches[i].pageY);
         updatePointerMoveData(pointer, posX, posY);
     }
-}, false);
+}, { passive: true });
 
 window.addEventListener('touchend', function (e) {
     var touches = e.changedTouches;

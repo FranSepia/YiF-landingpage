@@ -17,6 +17,36 @@
 /* Anti-parpadeo: ocultar las tarjetas hasta que el JS fije el tamaño final */
 .swiper .swiper-wrapper{ opacity: 0; }
 .swiper.yif-ready .swiper-wrapper{ opacity: 1; transition: opacity .18s ease; }
+
+/* Y&iF: en móvil la tarjeta activa se agranda (scale 1.2) y esa expansión la
+   hacía invadir el título "Soluciones" por arriba. Se baja el carrusel. */
+@media screen and (max-width:767px){
+  .slider-wrapper{ margin-top:230px; }
+}
+
+/* Y&iF: el footer traía un translateY(150px) exclusivo de móvil que lo
+   desprendía de su lugar natural, dejando un hueco enorme antes y después.
+   Y sus columnas colapsaban a ~1px de alto (flexbug de min-height:auto en
+   flex-direction:column), lo que encimaba el texto. */
+@media screen and (max-width:767px){
+  /* CAUSA RAÍZ: .page_wrap_seccion medía un % del viewport, no de su contenido,
+     así que el contenido se desbordaba y el footer aterrizaba encima. */
+  .page_wrap_seccion, .page_wrap_seccion.soluciones{ height:auto; }
+  /* "Proyectos en Desarrollo" era position:absolute, así que no ocupaba lugar
+     y caía encima de los nombres y los puntos del carrusel. En flujo normal
+     se acomoda después del carrusel y empuja el footer hacia abajo. */
+  .proyectos-en-desarrollo-section-2{ position:static; margin-top:70px; }
+  .section-23.footersoluciones{ position:static; transform:none; height:auto; }
+  /* el contenedor (columnas + dirección) es OTRO flex-column, mismo flexbug:
+     también se saca del flex para que la dirección no colapse a 0px. */
+  .footersoluciones .w-container{ display:block; height:auto; }
+  /* display:block en vez de tocar min-height: el flexbug persistía (el
+     item colapsaba a 0px igual con min-height:auto) porque las columnas
+     son a la vez flex-item Y flex-container de su propio texto centrado.
+     Sacarlas del flex evita la ambigüedad por completo. */
+  .footersoluciones .columns-6{ display:block; }
+  .footersoluciones .w-col{ width:100%; padding-top:6px; padding-bottom:6px; }
+}
 </style></head><body class="body-8"><button type="button" class="lang-toggle-btn" aria-label="Switch to English" title="Switch to English">EN</button><section class="page_wrap_seccion soluciones"><div><div><div data-w-id="d11fbee3-fe46-a72b-0bcf-738d28097f16" class="nav"><div class="hamburguer-wrapper"><div class="hamburguer-line top"></div><div class="hamburguer-line middle"></div><div class="hamburguer-line bottom"></div></div><a href="#" class="link-block-3 w-inline-block"><img src="assets/shared/img/68d7001718cbf575c0d6b6f1_Logo-estudio-creativo-gradiente-y-minimalista-fucsia-y-negro--_5_.png" loading="lazy" sizes="(max-width: 601px) 100vw, 601px" srcset="assets/shared/img/68d7001718cbf575c0d6b6f1_Logo-estudio-creativo-gradiente-y-minimalista-fucsia-y-negro--_5_-p-500.png 500w, assets/shared/img/68d7001718cbf575c0d6b6f1_Logo-estudio-creativo-gradiente-y-minimalista-fucsia-y-negro--_5_.png 601w" alt=""/></a><div class="nav-links-wrapper"><div class="nav-link-wrapper"><a href="index.html" class="link-4 home">Text Link</a><a href="index.html" class="navlinkd w-button">Button Text</a><div class="nav-link-inverter"><div class="nav-link-inverted" data-en="Home">Home</div></div></div><div class="nav-link-wrapper"><a href="ourwhy.html" class="link-4">Text Link</a><a href="#" class="navlinkd w-button">Button Text</a><div class="nav-link-inverter lo-que-nos-mueve"><div class="nav-link-inverted" data-en="What Drives Us<br/>">Lo que nos mueve<br/></div></div></div><div class="nav-link-wrapper"><a href="soluciones.html" aria-current="page" class="link-4 soluciones w--current">Text Link</a><a href="#" class="navlinkd w-button">Button Text</a><div class="nav-link-inverter soluciones"><div class="nav-link-inverted" data-en="Solutions">Soluciones</div></div></div><div class="nav-link-wrapper"><a href="why-innovation-atomic-model.html" class="link-4 metodologia">Text Link</a><a href="#" class="navlinkd w-button">Button Text</a><div class="nav-link-inverter metodologia"><div class="nav-link-inverted" data-en="Methodology<br/>">Metodología<br/></div></div></div><div class="nav-link-wrapper"><a href="contacto.html" class="link-4 contacto">Text Link</a><a href="#" class="navlinkd w-button">Button Text</a><div class="nav-link-inverter contacto"><div class="nav-link-inverted" data-en="Contact<br/>">Contacto<br/></div></div></div></div></div></div></div><section class="navbar"><div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="navbar-wrapper w-nav"><div class="navbar-container w-container"><a href="index.html" class="brand w-nav-brand"><img sizes="(max-width: 767px) 98vw, (max-width: 991px) 728px, 940px" srcset="assets/shared/img/68b6394649588bd5aca957c0_LogoYandiF-Blanco1-_1_-p-500.png 500w, assets/shared/img/68b6394649588bd5aca957c0_LogoYandiF-Blanco1-_1_-p-800.png 800w, assets/shared/img/68b6394649588bd5aca957c0_LogoYandiF-Blanco1-_1_-p-1080.png 1080w, assets/shared/img/68b6394649588bd5aca957c0_LogoYandiF-Blanco1-_1_.png 1137w" alt="Link to home page" src="assets/shared/img/68b6394649588bd5aca957c0_LogoYandiF-Blanco1-_1_.png" loading="lazy" class="image-11"/></a><nav role="navigation" class="nav-menu w-nav-menu"><a href="index.html" class="nav-link-2 w-nav-link" data-en="Home">Home</a><a href="ourwhy.html" class="nav-link w-nav-link" data-en="What Drives Us">Lo que nos mueve</a><a href="soluciones.html" aria-current="page" class="nav-link-3 w-nav-link w--current" data-en="Solutions">Soluciones</a><a href="why-innovation-atomic-model.html" class="nav-link-4 w-nav-link" data-en="Y&amp;iF Methodology">Metodología Y&amp;iF</a><a href="contacto.html" class="nav-link-5 w-nav-link" data-en="Contact">Contacto</a></nav></div></div><div class="navbar-glass-efect"></div><div class="navbar-glass-tint"></div><div class="navbar-glass-shine"></div></section><div class="w-layout-blockcontainer header-t w-container"><h1 class="heading-1-0" data-en="Solutions">Soluciones</h1></div><div class="w-embed w-script"><style>
   /* ===== Google Font ===== */
   @import url('assets/shared/css/gf_c4efd16d.css');
