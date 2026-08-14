@@ -1,8 +1,10 @@
-/* Botón sutil ES/EN — arriba a la derecha, espejo del logo/nav */
+/* Botón sutil ES/EN — esquina inferior derecha.
+   Antes iba arriba a la derecha, donde chocaba con el logo Y&iF. */
 .lang-toggle-btn {
   position: fixed;
-  top: .6rem;
-  right: 2rem;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  top: auto;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -39,14 +41,13 @@
   transform: scale(.95);
 }
 
-body.home .lang-toggle-btn {
-  top: 2.1rem;
-  right: 2.1rem;
-}
+/* La home lo separaba un poco más del borde; ahora que va abajo a la derecha
+   basta con la posición común, así queda igual en todas las pantallas. */
 
 @media (max-width: 767px) {
   .lang-toggle-btn {
-    top: 1.1rem;
+    top: auto;
+    bottom: 1.1rem;
     right: 1.1rem;
     width: 1.9rem;
     height: 1.9rem;

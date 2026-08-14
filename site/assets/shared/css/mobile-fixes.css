@@ -82,4 +82,56 @@
     letter-spacing: normal;
     line-height: 1.1;
   }
+
+  /* El contenedor centra las tarjetas en el alto de la pantalla
+     (min-height:100svh + justify-content:center). En pantallas cortas ese
+     centrado las subía hasta chocar con el título "Lo que nos mueve", que es
+     position:absolute y por tanto NO reserva espacio propio.
+     El padding-top reserva ese hueco a mano: las tarjetas siguen centradas,
+     pero dentro del espacio que queda por debajo del título. */
+  .u-container {
+    padding-top: 175px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  /* Al tocar una tarjeta se expandía a width:190%, que en celular se sale de
+     la pantalla. Apiladas a lo ancho ya ocupan el 100%: no hay que ensancharlas,
+     sólo dejar que crezcan de alto para mostrar su contenido. */
+  .benefits_card_wrap:hover,
+  .benefits_card_wrap:focus-within {
+    width: 100% !important;
+  }
+
+  /* --- Restos de ancho que alimentaban el zoom-out ------------------------
+     El carrusel de soluciones mide 1200px por diseño y la fila de nombres es
+     una lista larguísima; ambos sobresalen del ancho del teléfono. Recortarlos
+     en su propio contenedor deja el documento exactamente del ancho de la
+     pantalla, que es lo que evita que el navegador ofrezca "marco" extra.
+     Se usa clip (no hidden) para no crear un contenedor de scroll que rompa
+     el desplazamiento vertical.
+     Van con `body` delante y !important a propósito: la página de soluciones
+     declara `.swiper{overflow:visible!important}` en un <style> posterior a
+     este archivo, así que sin más peso esa regla ganaría. */
+  body .carousel-names-wrapper,
+  body .carousel-names,
+  body .swiper,
+  body .swiper-component {
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  /* Tarjeta digital de Humberto: un bloque de 425px dentro de 390. */
+  body .div-block-71,
+  body .page_wrap_seccion-4 {
+    max-width: 100% !important;
+    overflow-x: clip !important;
+  }
+
+  /* Último recurso, por si alguna pantalla futura vuelve a pasarse de ancho:
+     el documento nunca es más ancho que la pantalla, así que el navegador no
+     tiene "marco" extra que mostrar al intentar alejar. */
+  body {
+    max-width: 100vw;
+  }
 }
