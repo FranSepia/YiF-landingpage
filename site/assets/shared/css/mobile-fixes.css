@@ -139,11 +139,24 @@
   }
   /* Las tarjetas cerradas heredaban un word-spacing enorme (separa "Our" de
      "Why") y quedaban pegadas a la izquierda; sólo la abierta se centraba.
-     Lleva !important porque la regla original vive en un <style> posterior. */
+     Lleva !important porque la regla original vive en un <style> posterior.
+     OJO: el <h2> es `display:flex`. En un contenedor flex, `text-align` no
+     centra nada — el texto es un item anonimo que se alinea a flex-start. Por
+     eso el titulo seguia pegado a la izquierda aunque el text-align si estaba
+     aplicado. Lo que centra de verdad aqui es `justify-content`. */
   body .benefits_card_title {
     width: 100% !important;
+    justify-content: center !important;
+    align-items: center !important;
     text-align: center !important;
     word-spacing: normal !important;
+  }
+
+  /* El texto y el título comparten capa con el video de fondo; se asegura que
+     queden por encima para que no los tape el poster. */
+  .benefits_card_content {
+    position: relative;
+    z-index: 2;
   }
   .benefits_card_text {
     text-align: center;
@@ -151,13 +164,37 @@
 
   /* Revelar el texto al tocar. El diseño original usa :hover, que en iOS se
      comporta de forma errática (se queda pegado en una tarjeta y las demás no
-     abren nunca). assets/ourwhy/js/cards-tap.js pone la clase `is-open`. */
+     abren nunca). assets/ourwhy/js/cards-tap.js pone la clase `is-open`.
+
+     El colapso original se hace con grid-template-rows: 0fr -> 1fr. Safari
+     trata las filas `fr` de tamaño cero de otra forma que Chrome, así que en
+     el iPhone el texto seguía sin aparecer aunque la clase sí se aplicara.
+     En vez de pelear con el grid, la tarjeta abierta deja de ser grid
+     (display:block): así el 0fr no pinta nada y el texto simplemente fluye.
+     Se fuerza también el clip, que recorta con overflow/height. */
   .benefits_card_wrap.is-open .benefits_card_mask_wrap {
+    display: block !important;
     grid-template-rows: 1fr !important;
   }
+  .benefits_card_wrap.is-open .benefits_card_mask_clip {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+  .benefits_card_wrap.is-open .benefits_card_text {
+    display: block !important;
+    height: auto !important;
+    max-height: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  /* La tarjeta abierta crece para que el texto no quede cortado: tenia alto
+     fijo de 200px y el parrafo se salia por debajo del overflow:hidden. */
   .benefits_card_wrap.is-open {
     height: auto !important;
-    min-height: 200px;
+    min-height: 200px !important;
+    padding-bottom: 1.25rem !important;
   }
   .benefits_card_wrap {
     cursor: pointer;
