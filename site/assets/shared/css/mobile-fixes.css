@@ -91,16 +91,76 @@
      pero dentro del espacio que queda por debajo del título. */
   .u-container {
     padding-top: 175px;
+    padding-bottom: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
 
-  /* Al tocar una tarjeta se expandía a width:190%, que en celular se sale de
-     la pantalla. Apiladas a lo ancho ya ocupan el 100%: no hay que ensancharlas,
-     sólo dejar que crezcan de alto para mostrar su contenido. */
+  /* Al tocar una tarjeta se expandía a width:190% (1500% en el contenedor
+     angosto), que en celular se sale de la pantalla. Apiladas a lo ancho ya
+     ocupan el 100%: no hay que ensancharlas, sólo dejar que crezcan de alto. */
   .benefits_card_wrap:hover,
-  .benefits_card_wrap:focus-within {
+  .benefits_card_wrap:focus-within,
+  .benefits_card_wrap.is-open {
     width: 100% !important;
+  }
+
+  /* El contenedor tenía alto fijo de 500px, pero las tres tarjetas apiladas
+     suman ~630px. Se desbordaba y el footer, que va después en el flujo,
+     subía y tapaba la tarjeta de Visión. Con alto automático el footer
+     siempre queda por debajo de las tarjetas. */
+  .benefits_wrap,
+  .benefits_layout {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* La raíz de la página medía 443px mientras su contenido medía 903px: el
+     footer va después en el flujo, así que arrancaba a los 877px y se comía
+     la tarjeta de Visión. Con alto automático el footer siempre queda por
+     debajo de las tarjetas, se abran o no. */
+  .page_wrap_seccion {
+    height: auto !important;
+  }
+  .u-container {
+    min-height: 0 !important;
+  }
+
+  /* El párrafo traía height:500px fijo, así que la tarjeta abierta crecía
+     medio kilómetro. Que mida lo que mide su texto. */
+  .benefits_card_text {
+    height: auto !important;
+  }
+
+  /* Títulos de las tarjetas centrados (venían pegados a la izquierda). */
+  .benefits_card_header {
+    align-items: center;
+    text-align: center;
+  }
+  /* Las tarjetas cerradas heredaban un word-spacing enorme (separa "Our" de
+     "Why") y quedaban pegadas a la izquierda; sólo la abierta se centraba.
+     Lleva !important porque la regla original vive en un <style> posterior. */
+  body .benefits_card_title {
+    width: 100% !important;
+    text-align: center !important;
+    word-spacing: normal !important;
+  }
+  .benefits_card_text {
+    text-align: center;
+  }
+
+  /* Revelar el texto al tocar. El diseño original usa :hover, que en iOS se
+     comporta de forma errática (se queda pegado en una tarjeta y las demás no
+     abren nunca). assets/ourwhy/js/cards-tap.js pone la clase `is-open`. */
+  .benefits_card_wrap.is-open .benefits_card_mask_wrap {
+    grid-template-rows: 1fr !important;
+  }
+  .benefits_card_wrap.is-open {
+    height: auto !important;
+    min-height: 200px;
+  }
+  .benefits_card_wrap {
+    cursor: pointer;
   }
 
   /* --- Restos de ancho que alimentaban el zoom-out ------------------------
