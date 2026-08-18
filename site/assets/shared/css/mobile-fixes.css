@@ -59,145 +59,184 @@
   }
 
   /* --- "Lo que nos mueve": tarjetas Misión / Our Why / Visión --------------
-     Las tres se forzaban en fila (flex-direction:row) incluso en celular, y
-     quedaban de ~97px de ancho: el título se partía letra por letra en
-     vertical ("M i s i ó n"). En móvil se apilan una debajo de otra.
-     Lleva !important porque la regla row vive en un <style> más abajo del
-     documento y, a igualdad de especificidad, esa ganaría por orden. */
+     El diseño de escritorio mete las tres en fila y revela el texto con
+     `:hover`. En celular eso no funciona: no hay hover real (iOS lo simula y
+     se queda pegado), las tarjetas quedan de ~97px de ancho y el título se
+     parte letra por letra en vertical.
+
+     Aquí se rehace el bloque para móvil: tarjetas apiladas, título horizontal
+     centrado, y el texto oculto hasta que assets/ourwhy/js/cards-tap.js pone
+     la clase `is-open` al tocar.
+
+     Casi todo lleva `body` delante además de !important: las reglas que hay
+     que pisar viven en un <style> dentro del <body> de ourwhy.html (o sea,
+     posterior a este archivo) y algunas ya traen !important, así que sin más
+     especificidad ganarían ellas. */
   .benefits_layout {
     flex-direction: column !important;
     width: 100% !important;
     height: auto !important;
+    min-height: 0 !important;
   }
-  .benefits_card_wrap {
-    width: 100%;
-    height: 200px;
-    min-height: 200px;
+  /* El contenedor tenía alto fijo de 500px y ancho 110%; las tres tarjetas
+     apiladas suman más y el 110% se salía de la pantalla. */
+  .benefits_wrap {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
   }
-  /* El título va en vertical (writing-mode: vertical-rl) porque en escritorio
-     las tarjetas son columnas angostas. Apiladas a lo ancho en celular, el
-     texto tiene que leerse en horizontal. */
-  .benefits_card_title {
-    writing-mode: horizontal-tb !important;
-    letter-spacing: normal;
-    line-height: 1.1;
+  /* La raíz de la página medía 443px mientras su contenido medía 903px: el
+     footer va después en el flujo, así que se comía la tarjeta de Visión. */
+  .page_wrap_seccion {
+    height: auto !important;
   }
 
   /* El contenedor centra las tarjetas en el alto de la pantalla
      (min-height:100svh + justify-content:center). En pantallas cortas ese
      centrado las subía hasta chocar con el título "Lo que nos mueve", que es
      position:absolute y por tanto NO reserva espacio propio.
-     El padding-top reserva ese hueco a mano: las tarjetas siguen centradas,
-     pero dentro del espacio que queda por debajo del título. */
+     El padding-top reserva ese hueco a mano. */
   .u-container {
     padding-top: 175px;
     padding-bottom: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    min-height: 0 !important;
   }
 
-  /* Al tocar una tarjeta se expandía a width:190% (1500% en el contenedor
-     angosto), que en celular se sale de la pantalla. Apiladas a lo ancho ya
-     ocupan el 100%: no hay que ensancharlas, sólo dejar que crezcan de alto. */
-  .benefits_card_wrap:hover,
-  .benefits_card_wrap:focus-within,
-  .benefits_card_wrap.is-open {
+  /* --- Tarjeta cerrada: sólo el título, centrado --------------------------- */
+  .benefits_card_wrap {
     width: 100% !important;
+    height: 200px !important;
+    min-height: 200px !important;
+    justify-content: center;
+    padding: 1rem;
+    cursor: pointer;
   }
-
-  /* El contenedor tenía alto fijo de 500px, pero las tres tarjetas apiladas
-     suman ~630px. Se desbordaba y el footer, que va después en el flujo,
-     subía y tapaba la tarjeta de Visión. Con alto automático el footer
-     siempre queda por debajo de las tarjetas. */
-  .benefits_wrap,
-  .benefits_layout {
-    height: auto !important;
-    min-height: 0 !important;
+  /* `flex:1` + `space-between` empujaba el título arriba y el texto abajo del
+     todo; en móvil el bloque se centra como una sola pieza. */
+  body .benefits_card_content {
+    flex: 0 1 auto !important;
+    justify-content: center !important;
+    grid-row-gap: 0 !important;
+    grid-column-gap: 0 !important;
+    position: relative;
+    z-index: 2;              /* por encima del video y del overlay */
   }
-
-  /* La raíz de la página medía 443px mientras su contenido medía 903px: el
-     footer va después en el flujo, así que arrancaba a los 877px y se comía
-     la tarjeta de Visión. Con alto automático el footer siempre queda por
-     debajo de las tarjetas, se abran o no. */
-  .page_wrap_seccion {
-    height: auto !important;
-  }
-  .u-container {
-    min-height: 0 !important;
-  }
-
-  /* El párrafo traía height:500px fijo, así que la tarjeta abierta crecía
-     medio kilómetro. Que mida lo que mide su texto. */
-  .benefits_card_text {
-    height: auto !important;
-  }
-
-  /* Títulos de las tarjetas centrados (venían pegados a la izquierda). */
-  .benefits_card_header {
-    align-items: center;
+  body .benefits_card_header {
+    transform: none !important;   /* traía translateY(20px) */
+    width: 100%;
     text-align: center;
   }
-  /* Las tarjetas cerradas heredaban un word-spacing enorme (separa "Our" de
-     "Why") y quedaban pegadas a la izquierda; sólo la abierta se centraba.
-     Lleva !important porque la regla original vive en un <style> posterior.
-     OJO: el <h2> es `display:flex`. En un contenedor flex, `text-align` no
-     centra nada — el texto es un item anonimo que se alinea a flex-start. Por
-     eso el titulo seguia pegado a la izquierda aunque el text-align si estaba
-     aplicado. Lo que centra de verdad aqui es `justify-content`. */
+
+  /* El título estaba en `position:absolute` (para poder ir vertical pegado al
+     borde en escritorio angosto). Absoluto significa que NO ocupa sitio: el
+     párrafo se colocaba arriba del todo y el título le caía encima. Volverlo
+     estático es lo que hace que título y texto se apilen de verdad.
+     OJO: el <h2> es display:flex, así que lo que centra es `justify-content`,
+     no `text-align`. */
   body .benefits_card_title {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    white-space: normal !important;
+    transform: none !important;
     width: 100% !important;
+    display: flex !important;
     justify-content: center !important;
     align-items: center !important;
     text-align: center !important;
+    letter-spacing: normal !important;
     word-spacing: normal !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
   }
 
-  /* El texto y el título comparten capa con el video de fondo; se asegura que
-     queden por encima para que no los tape el poster. */
-  .benefits_card_content {
-    position: relative;
-    z-index: 2;
-  }
-  .benefits_card_text {
-    text-align: center;
-  }
-
-  /* Revelar el texto al tocar. El diseño original usa :hover, que en iOS se
-     comporta de forma errática (se queda pegado en una tarjeta y las demás no
-     abren nunca). assets/ourwhy/js/cards-tap.js pone la clase `is-open`.
-
+  /* --- El texto: oculto hasta tocar --------------------------------------
      El colapso original se hace con grid-template-rows: 0fr -> 1fr. Safari
-     trata las filas `fr` de tamaño cero de otra forma que Chrome, así que en
-     el iPhone el texto seguía sin aparecer aunque la clase sí se aplicara.
-     En vez de pelear con el grid, la tarjeta abierta deja de ser grid
-     (display:block): así el 0fr no pinta nada y el texto simplemente fluye.
-     Se fuerza también el clip, que recorta con overflow/height. */
-  .benefits_card_wrap.is-open .benefits_card_mask_wrap {
+     trata las filas `fr` de tamaño cero distinto que Chrome, así que en el
+     iPhone el texto asomaba (cortado) aunque tocara estar oculto. En móvil el
+     grid se apaga del todo (display:block) y quien manda es display none/block
+     sobre el párrafo: eso se comporta igual en todos los navegadores. */
+  body .benefits_card_mask_wrap {
     display: block !important;
-    grid-template-rows: 1fr !important;
+    grid-template-rows: none !important;
+    transform: none !important;
   }
-  .benefits_card_wrap.is-open .benefits_card_mask_clip {
+  body .benefits_card_mask_clip {
     overflow: visible !important;
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
   }
-  .benefits_card_wrap.is-open .benefits_card_text {
-    display: block !important;
+  /* El párrafo traía height:500px fijo Y transform:translateY(100px). El alto
+     fijo estiraba la tarjeta abierta medio kilómetro y el translate empujaba
+     el texto 100px hacia abajo, fuera del overflow:hidden de la tarjeta: por
+     eso en Visión "estaba ahí pero muy abajo" y en Misión salía cortado. */
+  body .benefits_card_text {
+    display: none !important;
     height: auto !important;
     max-height: none !important;
+    transform: none !important;
+    text-align: center !important;
+    text-indent: 0 !important;
+    margin: 0 !important;
+    padding-top: 0.85rem !important;
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+  }
+  /* El texto largo de "Our Why" venía justificado con line-height 1.1: en una
+     columna estrecha eso abre huecos enormes entre palabras y se lee mal. */
+  body .benefits_card_text.ourwhy {
+    text-align: left !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* --- Tarjeta abierta ---------------------------------------------------- */
+  .benefits_card_wrap.is-open {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px !important;
+    padding: 1.25rem 1.15rem 1.5rem !important;
+    /* Se queda en overflow:hidden (por las esquinas redondeadas y el video),
+       pero ya no recorta nada: con height:auto el alto lo pone el texto. */
+    overflow: hidden !important;
+  }
+  body .benefits_card_wrap.is-open .benefits_card_text {
+    display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
   }
-  /* La tarjeta abierta crece para que el texto no quede cortado: tenia alto
-     fijo de 200px y el parrafo se salia por debajo del overflow:hidden. */
-  .benefits_card_wrap.is-open {
-    height: auto !important;
-    min-height: 200px !important;
-    padding-bottom: 1.25rem !important;
+  /* Oscurecer el fondo sólo cuando está abierta, para que el texto se lea
+     sobre el video. En escritorio esto lo hacía el ::before en :hover. */
+  body .benefits_card_wrap.is-open::before {
+    background: rgba(0, 0, 0, 0.5) !important;
   }
-  .benefits_card_wrap {
-    cursor: pointer;
+
+  /* --- Anular el :hover en móvil ------------------------------------------
+     iOS simula el hover con el primer toque y se queda pegado: la tarjeta
+     tocada se ensanchaba al 1500%, se ponía negra y las otras dos bajaban a
+     opacidad 0.2. Peor aún, ese hover fantasma seguía revelando medio texto
+     después de cerrar (de ahí el "se corta una parte al volver a picar").
+     En móvil manda `is-open` y nada más. */
+  .benefits_card_wrap:hover {
+    width: 100% !important;
+    background-color: #0000 !important;
+  }
+  .benefits_card_wrap:hover::before {
+    background: #0000 !important;
+  }
+  body:has(.benefits_card_wrap:hover) .benefits_card_wrap:not(:hover) {
+    opacity: 1 !important;
+  }
+  body .benefits_card_wrap:hover .benefits_card_title {
+    line-height: 1.15 !important;
+    letter-spacing: normal !important;
   }
 
   /* --- Restos de ancho que alimentaban el zoom-out ------------------------
