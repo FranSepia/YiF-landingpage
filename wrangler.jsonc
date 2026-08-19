@@ -24,10 +24,12 @@
 
   "vars": {
     "NOTIFY_TO": "contacto@why-and-if.solutions",
-    // Hasta verificar el dominio en Resend, el remitente tiene que ser el
-    // compartido onboarding@resend.dev. Ya verificado, cámbialo por algo como
-    // "Y&iF Web <no-reply@why-and-if.solutions>".
-    "NOTIFY_FROM": "Y&iF Web <onboarding@resend.dev>"
+    // El dominio why-and-if.solutions ya está verificado en Resend, así que el
+    // aviso sale del dominio propio (mejor entregabilidad que el remitente
+    // compartido onboarding@resend.dev, y no depende de la cuenta de Resend).
+    // no-reply@ no necesita existir como buzón: solo firma el envío. Para que
+    // te puedan contestar ya va `reply_to` con el correo del prospecto.
+    "NOTIFY_FROM": "Y&iF Web <no-reply@why-and-if.solutions>"
   },
 
   "d1_databases": [
