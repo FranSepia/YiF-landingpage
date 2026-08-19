@@ -1,0 +1,40 @@
+{
+  // Configuración del Worker que sirve el sitio (Workers + assets estáticos).
+  //
+  // OJO: al desplegar con wrangler, ESTE archivo es la única fuente de verdad
+  // de los bindings y las variables. Lo que agregues a mano en el dashboard se
+  // pierde en el siguiente deploy, salvo los Secrets (esos se guardan aparte y
+  // por eso RESEND_API_KEY no aparece aquí).
+  "name": "yif-landingpage",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-08-01",
+
+  // site/ es todo lo que se sirve al público. El enrutador de assets lo
+  // atiende antes que el Worker y ya resuelve las URLs limpias.
+  "assets": {
+    "directory": "./site",
+    "binding": "ASSETS"
+  },
+
+  // Deja los console.error del formulario visibles en el dashboard
+  // (Worker → Observability → Logs). Sin esto, un fallo de correo es invisible.
+  "observability": {
+    "enabled": true
+  },
+
+  "vars": {
+    "NOTIFY_TO": "contacto@why-and-if.solutions",
+    // Hasta verificar el dominio en Resend, el remitente tiene que ser el
+    // compartido onboarding@resend.dev. Ya verificado, cámbialo por algo como
+    // "Y&iF Web <no-reply@why-and-if.solutions>".
+    "NOTIFY_FROM": "Y&iF Web <onboarding@resend.dev>"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "yif-landingpage-leads",
+      "database_id": "e5946b4b-9905-4b0c-8e42-519baef0174d"
+    }
+  ]
+}

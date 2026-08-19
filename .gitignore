@@ -22,3 +22,6 @@ venv/
 .netlify/
 .wrangler/
 node_modules/
+
+# Secretos de wrangler dev (nunca al repo)
+.dev.vars

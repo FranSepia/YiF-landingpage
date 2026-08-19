@@ -1,22 +1,23 @@
-// Cloudflare Pages Function — recibe el POST de site/contacto.html.
-// Ruta: /api/contact (el nombre del archivo define la ruta).
+// Maneja el POST del formulario de contacto de site/contacto.html.
+// Lo llama worker/index.js cuando entra un POST a /api/contact.
 //
-// OJO: esta carpeta va en la RAÍZ del repo, no dentro de site/. Cloudflare
-// exige que /functions esté en la raíz del proyecto y fuera de la carpeta de
-// archivos estáticos; cuando estuvo en site/functions/ la trató como assets y
-// /api/contact devolvía 404 (el formulario fallaba con "Ups, algo salió mal").
+// Este sitio corre como **Worker con assets estáticos**, no como Cloudflare
+// Pages. Por eso la lógica vive aquí y no en una carpeta `functions/`: esa
+// convención (un archivo por ruta) es exclusiva de Pages. Mientras el código
+// estuvo escrito como Pages Function, /api/contact devolvía 404 pasara lo que
+// pasara, porque en un Worker nadie lee esa carpeta.
 //
-// Bindings esperados en el proyecto de Pages (Settings → Functions):
-//   DB              (D1 database binding) — tabla `leads`, ver _work/d1/schema.sql
-//   RESEND_API_KEY  (variable de entorno "Secret") — sin ella no se manda correo
-//   NOTIFY_TO       (texto, opcional) — a quién avisar. Default: contacto@why-and-if.solutions
-//   NOTIFY_FROM     (texto, opcional) — remitente. Default: onboarding@resend.dev
+// Bindings y variables (wrangler.jsonc + Settings → Variables and Secrets):
+//   DB              (D1) — tabla `leads`, ver _work/d1/schema.sql
+//   RESEND_API_KEY  (Secret) — sin ella no se manda correo
+//   NOTIFY_TO       (var) — a quién avisar
+//   NOTIFY_FROM     (var) — remitente; ojo, Resend exige dominio verificado
 //
-// Guardar en D1 y avisar por correo son dos caminos independientes a propósito:
-// si uno falla, el otro todavía salva el lead. Sólo se devuelve error cuando
-// fallan los dos, que es el único caso en que el dato se pierde de verdad.
+// Guardar en D1 y avisar por correo son dos caminos independientes a
+// propósito: si uno falla, el otro todavía salva el lead. Sólo se devuelve
+// error cuando fallan los dos, que es el único caso en que el dato se pierde.
 
-export async function onRequestPost({ request, env }) {
+export async function manejarContacto(request, env) {
   let form;
   try {
     form = await request.formData();
