@@ -36,13 +36,13 @@ Duplicado Landing Page Y&iF/
 │   │       ├── y-and-if/                 (3 img + 2 video)
 │   │       └── humberto-gonzalez-olmos/  (16 img + 2 video)
 │   │   └── contacto/js/      ← contact-form.js (envía el form a /api/contact)
-│   ├── functions/
-│   │   └── api/contact.js    ← Cloudflare Pages Function: guarda el lead en D1 + avisa por correo
 │   ├── favicon.ico
 │   ├── robots.txt
 │   ├── sitemap.xml
 │   ├── vercel.json           ← URLs limpias + redirects de las tarjetas
 │   └── netlify.toml
+├── functions/                ← Cloudflare Pages Functions (NO va dentro de site/, ver abajo)
+│   └── api/contact.js        ← guarda el lead en D1 + avisa por correo
 ├── _work/                    ← material de trabajo (NO se despliega)
 │   ├── localize.py           ← baja el sitio original y genera /site (plano)
 │   ├── reorganize.py         ← reparte /site/assets en carpetas por página
@@ -56,6 +56,14 @@ Duplicado Landing Page Y&iF/
 ```
 
 Todo lo que se sirve al público está dentro de **`site/`**. La carpeta `_work/` es solo para regenerar o auditar la copia.
+
+> **`functions/` vive en la raíz del repo, no en `site/`.** Cloudflare exige que la
+> carpeta de Functions esté en la raíz del proyecto y *fuera* de la carpeta de
+> archivos estáticos ([docs](https://developers.cloudflare.com/pages/functions/get-started/):
+> *"Make sure that the `/functions` directory is at the root of your Pages project
+> (and not in the static root, such as `/dist`)"*). Cuando estuvo en `site/functions/`,
+> Cloudflare la trató como archivos estáticos y `/api/contact` devolvía 404: el
+> formulario fallaba con "Ups, algo salió mal".
 
 ### Dónde va un asset nuevo
 
@@ -106,7 +114,7 @@ En los tres casos, **la carpeta a publicar es `site/`** (no la raíz del proyect
 
 | Plataforma | Cómo |
 |---|---|
-| **Cloudflare Pages** (la que se usa hoy) | Conecta el repo de GitHub, *build output directory* = `site`. Trae **URLs limpias** por defecto y sirve `site/functions/api/contact.js` automáticamente (la función del formulario de contacto). Ver el paso a paso completo en la sección del formulario, más abajo. |
+| **Cloudflare Pages** (la que se usa hoy) | Conecta el repo de GitHub, *build output directory* = `site`. Trae **URLs limpias** por defecto y sirve `functions/api/contact.js` automáticamente (la función del formulario de contacto). Ver el paso a paso completo en la sección del formulario, más abajo. |
 | **Vercel** | Arrastra `site/` en vercel.com/new, o `cd site && vercel`. El `vercel.json` ya activa URLs limpias. El formulario de contacto **no funciona aquí tal cual** — está escrito como Cloudflare Pages Function + D1; en Vercel habría que reescribirlo como Vercel Function + otra base de datos. |
 | **Netlify** | Arrastra `site/` en app.netlify.com/drop, o conecta el repo con *publish directory* = `site`. Netlify sirve `/contacto` desde `contacto.html` automáticamente. Mismo caso: el formulario necesitaría reescribirse como Netlify Function. |
 
@@ -130,7 +138,7 @@ Después apunta tu dominio **why-and-if.solutions** al nuevo host (registro DNS)
 
 ### 1. Formulario de contacto (`contacto.html`) — resuelto, corre en Cloudflare Pages
 
-El formulario `email-form` enviaba a los servidores de **Webflow**, que ya no existen. Se reemplazó por una **Cloudflare Pages Function** propia: `site/functions/api/contact.js`, que guarda cada envío en **D1** (la base SQL de Cloudflare) y opcionalmente avisa por correo vía **Resend**. Cero servicios de terceros que cobren, cero límite de envíos/mes.
+El formulario `email-form` enviaba a los servidores de **Webflow**, que ya no existen. Se reemplazó por una **Cloudflare Pages Function** propia: `functions/api/contact.js` (en la raíz del repo, no dentro de `site/`), que guarda cada envío en **D1** (la base SQL de Cloudflare) y opcionalmente avisa por correo vía **Resend**. Cero servicios de terceros que cobren, cero límite de envíos/mes.
 
 Cómo quedó armado (para que sepas qué tocar si algo cambia):
 
@@ -154,9 +162,11 @@ Cómo quedó armado (para que sepas qué tocar si algo cambia):
    ```
 
 3. **Conecta el repo en Cloudflare Pages** (dashboard → Workers & Pages → Create → Pages → conecta `FranSepia/YiF-landingpage`):
+   - *Root directory*: `/` (vacío, la raíz del repo — es donde vive `functions/`)
    - *Build output directory*: `site`
    - *Build command*: (vacío, es HTML estático)
    - En **Settings → Functions → D1 database bindings**: variable `DB` → tu base `yif-landingpage-leads`.
+     Agrégalo **en los dos entornos** (Production y Preview) o la rama de preview fallará.
 
 4. **(Opcional pero recomendado) Aviso por correo con Resend:**
    - Crea una cuenta gratis en https://resend.com y copia tu API key (100 correos/día gratis).
@@ -170,12 +180,18 @@ npx wrangler d1 execute yif-landingpage-leads --remote --command "SELECT * FROM 
 ```
 O desde el dashboard: Workers & Pages → D1 → `yif-landingpage-leads` → pestaña *Tables*.
 
-**Probarlo en tu máquina antes de subir cambios** (sin tocar tu cuenta real de Cloudflare, usa una base D1 local de prueba):
+**Probarlo en tu máquina antes de subir cambios** (sin tocar tu cuenta real de Cloudflare, usa una base D1 local de prueba). Se corre **desde la raíz del repo**, para que wrangler encuentre `functions/` — igual que hace Cloudflare al desplegar:
 ```bash
-cd site
-npx wrangler pages dev . --d1 DB=test-local
+npx wrangler pages dev site --d1 DB=test-local
 ```
 Abre `http://127.0.0.1:8788/contacto`, llena el formulario y mándalo. Para darle datos a esa base local, corre el mismo `wrangler d1 execute ... --local --file=...` sin `--remote`.
+
+Prueba rápida de que la ruta existe (sin llenar el formulario): un POST vacío debe contestar JSON, no un 404.
+```bash
+curl -X POST http://127.0.0.1:8788/api/contact -F "name=x"
+# {"ok":false,"error":"missing_fields"}  ← la Function corrió
+# 404 / HTML                             ← Cloudflare no está viendo functions/
+```
 
 Mientras tanto, el contacto sigue disponible también por los datos del pie: **contacto@why-and-if.solutions**, **55 4748 0723** y los botones de **WhatsApp**.
 
