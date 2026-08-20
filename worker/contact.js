@@ -48,12 +48,19 @@ export async function manejarContacto(request, env) {
     ip: request.headers.get('cf-connecting-ip') || '',
   });
 
-  const avisado = await avisarPorCorreo(env, {
+  const aviso = await avisarPorCorreo(env, {
     nombre, contacto, empresa, solucion, preferencia, info,
   });
 
-  if (!guardado && !avisado) {
+  if (!guardado && !aviso.ok) {
     return json({ ok: false, error: 'db_error' }, 500);
+  }
+
+  // Con el campo diag=1, la respuesta incluye por qué falló el correo. El
+  // formulario nunca lo manda: es para diagnosticar desde fuera sin tener que
+  // ir a buscar los logs del dashboard. No expone la API key, solo el motivo.
+  if ((form.get('diag') || '').toString() === '1') {
+    return json({ ok: true, guardado, mail: aviso });
   }
 
   return json({ ok: true });
@@ -92,7 +99,7 @@ async function guardarEnD1(env, lead) {
 async function avisarPorCorreo(env, lead) {
   if (!env.RESEND_API_KEY) {
     console.error('contact: falta RESEND_API_KEY, no se manda aviso por correo');
-    return false;
+    return { ok: false, detalle: 'falta RESEND_API_KEY' };
   }
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -120,13 +127,14 @@ async function avisarPorCorreo(env, lead) {
     if (!res.ok) {
       // Resend explica el motivo en el cuerpo (dominio sin verificar, API key
       // inválida, destinatario no permitido...). Sin esto el fallo es invisible.
-      console.error('contact: Resend respondió', res.status, await res.text());
-      return false;
+      const cuerpo = await res.text();
+      console.error('contact: Resend respondió', res.status, cuerpo);
+      return { ok: false, detalle: `HTTP ${res.status} ${cuerpo}`.slice(0, 300) };
     }
-    return true;
+    return { ok: true, detalle: 'enviado' };
   } catch (err) {
     console.error('contact: no se pudo llamar a Resend:', err && err.message);
-    return false;
+    return { ok: false, detalle: 'excepcion: ' + (err && err.message) };
   }
 }
 
