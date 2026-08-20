@@ -1,0 +1,486 @@
+/* ==========================================================================
+   Correcciones de responsive — se carga DESPUÉS del CSS de Webflow.
+   ==========================================================================
+
+   El sitio salió de Webflow posicionado con transforms en píxeles fijos
+   (translate(-250px), translate(200px)…) calibrados a ojo para un monitor
+   ancho de ~1440px. En cualquier otra proporción —sobre todo un monitor
+   vertical— eso empujaba la barra fuera de la pantalla, descuadraba el logo
+   y mandaba los botones del home debajo del área visible.
+
+   Aquí se sustituye ese posicionamiento por flexbox y medidas relativas,
+   sin tocar el CSS original de Webflow (que sigue mandando en desktop
+   cuando ya se veía bien).
+
+   Además, el export de Webflow trae data-collapse="medium": abajo de 991px
+   Webflow esconde el menú y espera un botón .w-nav-button que NUNCA vino en
+   el HTML exportado. Resultado: no había menú en pantallas medianas.
+   El botón lo inyecta assets/shared/js/nav-mobile.js y aquí van sus estilos.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Nada de scroll horizontal en ninguna página
+   -------------------------------------------------------------------------- */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. Barra de navegación (páginas interiores)
+   Se anulan los transforms fijos y se deja que flexbox reparta el espacio.
+   -------------------------------------------------------------------------- */
+.navbar-wrapper {
+  transform: none;
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Webflow mete ::before/::after (content:" ";display:table) en .w-container como
+   clearfix para su layout viejo de floats. Dentro de un contenedor flex esos
+   pseudo-elementos SÍ cuentan como hijos: con space-between se comían dos
+   posiciones y empujaban el logo hasta el centro de la barra. */
+.navbar-container::before,
+.navbar-container::after {
+  display: none;
+}
+
+.brand,
+.image-11 {
+  transform: none;
+}
+
+.brand {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  /* En ≤479px Webflow lo subía 27px y lo corría 285px a la derecha: el logo
+     terminaba flotando fuera de la isla de la barra. */
+  top: auto;
+}
+
+/* El sitio trae DOS menús: éste (.nav, un panel lateral con hamburguesa que
+   Webflow dejó sin conectar — sus enlaces siguen diciendo "Text Link") y la
+   barra .navbar que sí se usa. En ≤479px el CSS original volvía a mostrar el
+   viejo, así que en el celular aparecían dos hamburguesas y la de arriba a la
+   izquierda no hacía nada. Se esconde: el menú bueno es el de nav-mobile.js. */
+.nav {
+  display: none !important;
+}
+
+/* El menú ocupa el espacio sobrante y reparte los enlaces sin transforms. */
+.nav-menu.w-nav-menu {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(.75rem, 2.2vw, 2.5rem);
+}
+
+.nav-menu.w-nav-menu .w-nav-link {
+  transform: none;
+  margin: 0;
+  padding: 10px 0;
+  white-space: nowrap;
+  font-size: clamp(.85rem, 1.05vw, 1.1rem);
+}
+
+/* --------------------------------------------------------------------------
+   3. Menú desplegable para pantallas medianas y chicas (≤991px)
+   -------------------------------------------------------------------------- */
+.yf-nav-toggle {
+  display: none;
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  z-index: 3100;
+}
+
+.yf-nav-toggle span,
+.yf-nav-toggle span::before,
+.yf-nav-toggle span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 22px;
+  height: 2px;
+  background: var(--botones, #fff);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: transform .25s ease, opacity .2s ease;
+}
+
+.yf-nav-toggle span {
+  top: 50%;
+  margin-top: -1px;
+}
+
+.yf-nav-toggle span::before {
+  top: -7px;
+  left: 0;
+  transform: none;
+}
+
+.yf-nav-toggle span::after {
+  top: 7px;
+  left: 0;
+  transform: none;
+}
+
+/* Estado abierto: las tres líneas se vuelven una X */
+.yf-nav-open .yf-nav-toggle span {
+  background: transparent;
+}
+
+.yf-nav-open .yf-nav-toggle span::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.yf-nav-open .yf-nav-toggle span::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media screen and (max-width: 991px) {
+  .yf-nav-toggle {
+    display: block;
+  }
+
+  /* Webflow ya lo esconde; se repite para que el estado cerrado sea explícito. */
+  .navbar-wrapper.w-nav .nav-menu.w-nav-menu {
+    display: none;
+  }
+
+  /* Abierto: panel desplegable debajo de la barra. */
+  .navbar-wrapper.w-nav.yf-nav-open .nav-menu.w-nav-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+    padding: .5rem 0;
+    position: absolute;
+    top: calc(100% - .5rem);
+    left: 0;
+    right: 0;
+    z-index: 3000;
+    background: rgba(12, 12, 12, .96);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-radius: 1.25rem;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+  }
+
+  .navbar-wrapper.w-nav.yf-nav-open .nav-menu.w-nav-menu .w-nav-link {
+    padding: .85rem 1.5rem;
+    font-size: 1rem;
+    text-align: left;
+  }
+
+  .navbar-wrapper.w-nav.yf-nav-open .nav-menu.w-nav-menu .w-nav-link:hover {
+    background: rgba(255, 255, 255, .07);
+  }
+
+  /* La barra necesita ser el ancla del panel y no recortarlo. */
+  .navbar {
+    height: auto;
+    transform: none;
+    overflow: visible;
+  }
+
+  .navbar-wrapper {
+    position: relative;
+  }
+
+  .navbar-container {
+    height: 64px;
+  }
+
+  /* Webflow reposicionaba la barra y el logo a mano en este breakpoint. */
+  .navbar-wrapper,
+  .brand {
+    transform: none;
+  }
+
+  /* …y empujaba toda la página 120px hacia abajo. */
+  .page_wrap_seccion {
+    transform: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4. Home: el lienzo debe cubrir toda la pantalla y los botones verse siempre
+   --------------------------------------------------------------------------
+   El lienzo tenía height:120vw — o sea, su alto dependía del ANCHO de la
+   ventana. En un monitor vertical (angosto y alto) quedaba muy corto y se veía
+   la mitad de abajo en negro. Ahora se ata al alto real de la ventana.        */
+body.home .page_wrap_seccion {
+  position: relative;
+  height: auto;
+  min-height: 100vh;
+  transform: none;
+}
+
+body.home .canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  max-height: none;
+  margin: 0;
+  z-index: 0;
+}
+
+/* El header deja de medir 100vh exactos (que empujaba los botones fuera de la
+   pantalla) y reserva el espacio de la fila de botones. */
+body.home .header {
+  transform: none;
+  height: calc(100vh - 190px);
+  min-height: 260px;
+  position: relative;
+  z-index: 1;
+}
+
+/* El logo era 517x300 fijos y posicionado en absolute: no cabía en pantallas
+   angostas. Ahora lo centra el flex del header y escala con la ventana. */
+body.home .logo {
+  position: relative;
+  width: min(517px, 72vw);
+  height: auto;
+  margin: 0;
+}
+
+body.home .container-3 {
+  position: relative;
+  z-index: 2;
+  margin-top: 0;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  gap: clamp(.5rem, 2vw, 2rem);
+}
+
+body.home .btn-2-w-2 {
+  height: auto;
+  min-height: 64px;
+  margin-bottom: 0;
+  padding: .75rem .5rem;
+  font-size: clamp(.7rem, 1.15vw, 1rem);
+  letter-spacing: clamp(1px, .22vw, 3px);
+  text-align: center;
+}
+
+body.home .section-23,
+body.home .footersoluciones {
+  position: relative;
+  z-index: 2;
+}
+
+/* Pantallas chicas: los tres botones en columna, legibles y sin encimarse. */
+@media screen and (max-width: 767px) {
+  body.home .header {
+    height: calc(100vh - 300px);
+  }
+
+  body.home .container-3 {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  body.home .columns-4 {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body.home .column-7,
+  body.home .column-8,
+  body.home .div-block-24 {
+    width: 100%;
+  }
+
+  body.home .btn-2-w-2 {
+    min-height: 56px;
+    margin-bottom: .5rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4b. Tarjetas de "Lo que nos mueve" en pantallas angostas
+   --------------------------------------------------------------------------
+   El diseño original, cuando el contenedor baja de 55em, deja las tres
+   tarjetas en fila y pone los títulos en vertical con text-orientation:upright
+   — o sea, las letras apiladas una encima de otra ("M i s i ó n"). En un
+   monitor vertical eso es justo lo que se ve, y se lee pésimo.
+
+   Aquí se apilan las tarjetas en columna con el título horizontal, que además
+   aprovecha el alto que sobra en ese tipo de pantalla. La especificidad es
+   alta a propósito: las reglas originales viven en un <style> dentro del
+   propio HTML, que va después de esta hoja.                                   */
+@media screen and (max-width: 991px) {
+  .benefits_wrap {
+    height: auto;
+  }
+
+  .benefits_wrap .benefits_layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .benefits_wrap .benefits_layout .benefits_card_wrap {
+    width: 100%;
+    min-height: 210px;
+  }
+
+  /* El hover ensanchaba la tarjeta un 1500%: sin sentido ya en columna. */
+  .benefits_wrap .benefits_layout .benefits_card_wrap:hover {
+    width: 100%;
+  }
+
+  /* Título horizontal otra vez, y siempre visible. */
+  .benefits_wrap .benefits_layout .benefits_card_title {
+    position: static;
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    white-space: normal;
+    display: block;
+    left: auto;
+    line-height: 1.2 !important;
+    letter-spacing: 0 !important;
+    word-spacing: normal !important;
+    font-size: 1.6rem;
+    text-align: left;
+    transform: none;
+  }
+
+  /* El texto de cada tarjeta deja de estar colapsado a 0fr. */
+  .benefits_wrap .benefits_layout .benefits_card_mask_wrap {
+    grid-template-rows: 1fr;
+  }
+
+  /* Sin el efecto de atenuar las demás al pasar el cursor. */
+  body:has(.benefits_card_wrap:hover) .benefits_wrap .benefits_card_wrap:not(:hover) {
+    opacity: 1;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4c. Soluciones: el carrusel se salía de la pantalla
+   --------------------------------------------------------------------------
+   En ≤991px Webflow movía el bloque del carrusel con translate(250px) y sus
+   flechas con translate(-200px,-300px) / translate(220px,-330px). Eso lo
+   empujaba ~275px fuera del borde derecho y aparecía la barra de scroll
+   horizontal. Se anulan y el carrusel se centra solo.                        */
+@media screen and (max-width: 991px) {
+  .page,
+  .main,
+  .slider-wrapper,
+  .swiper-component,
+  .layout,
+  .heading-12 {
+    transform: none;
+  }
+
+  .slider-arrow.cc-prev,
+  .slider-arrow.cc-next {
+    transform: none;
+  }
+
+  .cta-wrapper {
+    margin-top: 2rem;
+  }
+
+  /* El carrusel de Swiper mide 1200px fijos; que quepa en la ventana. */
+  .swiper.swiper-creative,
+  .swiper-component,
+  .slider-wrapper,
+  .carousel-names-wrapper,
+  .carousel-names {
+    max-width: 100%;
+  }
+
+  .swiper.swiper-creative {
+    overflow: hidden;
+  }
+
+  /* La sección medía width:120% (468px en una pantalla de 390px): sobresalía
+     83px por la derecha y se llevaba consigo la barra y el carrusel. */
+  .page_wrap_seccion.soluciones {
+    width: 100%;
+    height: auto;
+    left: 0;
+  }
+
+  /* Swiper trae min-width:1200px de fábrica; en móvil hay que soltarlo o
+     ninguna corrección de ancho sirve. */
+  .swiper {
+    min-width: 0;
+  }
+
+  /* La lista de nombres bajo el carrusel es una sola línea larguísima. */
+  .carousel-names {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4d. Contacto: el formulario y la vista previa, uno debajo del otro en celular
+   --------------------------------------------------------------------------
+   La rejilla es de dos columnas fijas. En un teléfono eso dejaba la vista
+   previa del mensaje en 107px de ancho: una palabra por renglón.             */
+@media screen and (max-width: 767px) {
+  .yif-form .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .yif-form .div-block-15,
+  .yif-form .div-block-25 {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. Títulos de página: no deben salirse ni encimarse con la barra
+   -------------------------------------------------------------------------- */
+.header-t {
+  margin-left: clamp(1rem, 4vw, 40px);
+  margin-right: clamp(1rem, 4vw, 40px);
+  max-width: calc(100% - 2rem);
+}
+
+.heading-1-0 {
+  position: relative;
+  font-size: clamp(1.6rem, 4.2vw, 40px);
+  line-height: 1.15;
+}
+
+/* --------------------------------------------------------------------------
+   6. Contenedores de Webflow: que respiren en pantallas medianas
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 991px) {
+  .w-container {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

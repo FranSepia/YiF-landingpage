@@ -30,7 +30,16 @@ SOFTWARE.
 
 // Simulation code
 
+// Si el <canvas> todavía no existe cuando corre este script, antes reventaba
+// aquí mismo ("Cannot read properties of undefined") y el fondo se quedaba en
+// negro hasta recargar a mano. Se crea uno de respaldo en vez de morir.
 var canvas = document.getElementsByTagName('canvas')[0];
+if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    (document.querySelector('.canvas') || document.body).appendChild(canvas);
+}
 resizeCanvas();
 
 var config = {
