@@ -133,8 +133,40 @@ body > .page_wrap_seccion > .section-26 {
    2. Barra de navegación (páginas interiores)
    Se anulan los transforms fijos y se deja que flexbox reparta el espacio.
    -------------------------------------------------------------------------- */
+/* La cápsula quedaba cortada por arriba: .page_wrap_seccion sube todo 30px con
+   un translateY(-30px), así que la barra terminaba en y=-4 y sólo se veía su
+   borde inferior. Se quita ese empujón, igual que se hace en pantallas chicas. */
+.page_wrap_seccion {
+  transform: none;
+}
+
+/* Y adentro, el contenedor medía 80px mientras la cápsula mide 55: el logo
+   (45px de alto) se salía por debajo del óvalo y los enlaces quedaban a otra
+   altura. Igualando alturas, logo y enlaces se centran en la cápsula. */
+.navbar {
+  height: 64px;
+}
+
+.navbar-container {
+  height: 100%;
+}
+
+/* Las tres capas que dibujan el óvalo de vidrio medían width:90% en móvil, así
+   que la cápsula salía más angosta que la barra y se veía cortada por la
+   derecha. Deben calcar exactamente el tamaño de la barra. */
+.navbar-glass-efect,
+.navbar-glass-tint,
+.navbar-glass-shine {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: inherit;
+}
+
 .navbar-wrapper {
   transform: none;
+  height: 100%;
   padding-left: clamp(1rem, 3vw, 2rem);
   padding-right: clamp(1rem, 3vw, 2rem);
 }
@@ -297,19 +329,33 @@ body > .page_wrap_seccion > .section-26 {
     background: rgba(255, 255, 255, .07);
   }
 
-  /* La barra necesita ser el ancla del panel y no recortarlo. */
+  /* La barra necesita ser el ancla del panel y no recortarlo. Con height:auto
+     la barra crecía a 100px y su contenido quedaba 36px más abajo que la
+     cápsula: el logo se veía flotando por debajo del óvalo. */
   .navbar {
-    height: auto;
+    height: 64px;
     transform: none;
     overflow: visible;
   }
 
   .navbar-wrapper {
     position: relative;
+    height: 64px;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .navbar-container {
     height: 64px;
+  }
+
+  /* Webflow pinta el tinte de la cápsula con #fff9 (blanco casi opaco) en este
+     breakpoint. Antes no se notaba porque la capa medía 90% y quedaba corrida;
+     ahora que calca la barra, la cápsula salía blanca sobre un sitio oscuro.
+     Se pone del mismo gris translúcido que se ve en escritorio. */
+  .navbar-glass-tint {
+    background-color: rgba(13, 13, 13, .55);
   }
 
   /* Webflow reposicionaba la barra y el logo a mano en este breakpoint. */
@@ -330,34 +376,42 @@ body > .page_wrap_seccion > .section-26 {
    El lienzo tenía height:120vw — o sea, su alto dependía del ANCHO de la
    ventana. En un monitor vertical (angosto y alto) quedaba muy corto y se veía
    la mitad de abajo en negro. Ahora se ata al alto real de la ventana.        */
+/* Alto reservado para la fila de botones. La portada = header + botones debe
+   medir exactamente una pantalla, para que el pie quede JUSTO abajo del borde
+   y no se asome al entrar: aparece sólo al hacer scroll. */
+body.home {
+  --yf-actions: 140px;
+}
+
 body.home .page_wrap_seccion {
   position: relative;
   height: auto;
-  min-height: 100vh;
   transform: none;
+  /* En móvil Webflow le mete margin-top:20px: eso dejaba una franja negra
+     arriba del lienzo y empujaba la fila de botones 20px fuera de la pantalla,
+     cortando "CONTACTO". La portada tiene que arrancar pegada al borde. */
+  margin-top: 0;
 }
 
-/* El lienzo cubre exactamente el alto del contenedor. Antes medía 100vh a
-   secas y, como el contenedor terminaba un poco antes, sobraba una franja de
-   colores por debajo del pie de página. */
+/* El lienzo cubre exactamente la portada: una pantalla completa. Debajo ya
+   empieza el pie, que trae su propio fondo. */
 body.home .canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   max-height: none;
   margin: 0;
   z-index: 0;
 }
 
-/* El header ya no mide un calc() a ojo: se estira para ocupar lo que sobre,
-   así los botones y el pie caen siempre justo al fondo de la ventana. */
+/* header + fila de botones = exactamente 100vh. */
 body.home .header {
   transform: none;
-  flex: 1 1 auto;
-  height: auto;
-  min-height: 260px;
+  flex: 0 0 auto;
+  height: calc(100vh - var(--yf-actions));
+  min-height: 240px;
   position: relative;
   z-index: 1;
 }
@@ -383,7 +437,9 @@ body.home .container-3 {
   padding-right: 1rem;
   width: 100%;
   max-width: min(1100px, 94vw);
+  height: var(--yf-actions);
   flex-wrap: wrap;
+  align-items: center;
   gap: clamp(.75rem, 3vw, 3.5rem);
 }
 
@@ -427,13 +483,19 @@ body.home .footersoluciones {
 
 /* Pantallas chicas: los tres botones en columna, legibles y sin encimarse. */
 @media screen and (max-width: 767px) {
-  body.home .header {
-    height: calc(100vh - 300px);
+  /* Apilados ocupan bastante más alto que en una sola fila. */
+  body.home {
+    --yf-actions: 275px;
   }
 
   body.home .container-3 {
     flex-direction: column;
+    /* nowrap es clave: en columna y con alto fijo, "wrap" mandaba el tercer
+       botón a una SEGUNDA columna y "CONTACTO" terminaba encimado sobre
+       "LO QUE NOS MUEVE" y cortado por el borde de la pantalla. */
+    flex-wrap: nowrap;
     align-items: stretch;
+    justify-content: center;
     max-width: 420px;
     margin-left: auto;
     margin-right: auto;
