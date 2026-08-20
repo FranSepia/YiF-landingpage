@@ -19,12 +19,114 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Nada de scroll horizontal en ninguna página
-   -------------------------------------------------------------------------- */
-html,
-body {
+   1. Nada de scroll horizontal, y que la página SÍ pueda crecer a lo alto
+   --------------------------------------------------------------------------
+   Webflow deja body con height:100%. Si encima se le pone overflow-x:hidden,
+   el body se convierte en su propio contenedor de scroll y queda recortado a
+   la altura de la ventana: el documento dejaba de crecer y el pie de página
+   quedaba fuera de alcance. Con height:auto + min-height:100% el documento
+   crece con su contenido y quien hace scroll vuelve a ser la ventana.        */
+html {
   overflow-x: hidden;
   max-width: 100%;
+  height: auto;
+  min-height: 100%;
+}
+
+/* Ojo con el selector: Webflow trae .body-8{height:100%;min-height:auto} y esa
+   clase le gana a un "body" pelón. body[class] pesa más y sí lo sobreescribe.
+
+   Y aquí va overflow-x:clip, NO hidden: "hidden" convertiría al body en su
+   propio contenedor de scroll (recortando la página al alto de la ventana),
+   mientras que "clip" recorta lo que se desborde a los lados sin crear ese
+   contenedor, que es justo lo que se quiere. */
+body[class] {
+  overflow-x: clip;
+  max-width: 100%;
+  height: auto;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   1b. Pie de página SIEMPRE hasta abajo, sin franja debajo
+   --------------------------------------------------------------------------
+   Cuando el contenido no llena la pantalla, el pie quedaba flotando a media
+   altura y por debajo se asomaba el lienzo animado (en el home eran 26px de
+   colores debajo del pie). Con body en columna y min-height del alto de la
+   ventana, "margin-top:auto" empuja el pie hasta el fondo; si el contenido es
+   más largo que la ventana, se queda al final del contenido, como debe ser.
+
+   El pie no está anidado igual en todas: en index y metodología va dentro de
+   .page_wrap_seccion, y en ourwhy, soluciones y contacto cuelga directo del
+   body. Por eso se cubren los dos casos.                                     */
+body[class] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Los bloques de contenido no deben encogerse para "caber": crecen y la
+   ventana hace scroll. */
+body > section,
+body > div {
+  flex-shrink: 0;
+}
+
+/* Caso A — el pie cuelga directo del body (ourwhy, soluciones, contacto). */
+body > .section-22,
+body > .section-23,
+body > .section-24,
+body > .section-26 {
+  margin-top: auto;
+}
+
+/* Caso B — el pie va dentro del contenedor de la página (index, metodología):
+   el contenedor crece para llenar la ventana y adentro se repite el truco. */
+body > .page_wrap_seccion {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+body > .page_wrap_seccion > .section-23,
+body > .page_wrap_seccion > .section-26 {
+  margin-top: auto;
+}
+
+/* El pie de Metodología nunca estuvo en el flujo: iba position:absolute con
+   inset:auto 0% -55% en escritorio y position:relative con top:500px abajo de
+   991px. Ese empujón de 500px era el "espacio gigante" antes del pie. Se
+   devuelve al flujo normal para que el margin-top:auto de arriba lo acomode. */
+.section-26 {
+  position: static;
+  inset: auto;
+}
+
+/* El contenedor del diagrama de órbitas estaba topado a max-height:500px, pero
+   el diagrama de adentro pide min-height:100vh. Se desbordaba ~400px y, con el
+   pie ya en el flujo, el diagrama terminaba dibujándose encima y por debajo de
+   él. Que el contenedor mida lo que mide su contenido. */
+.code-embed-4 {
+  max-height: none;
+}
+
+/* Las tarjetas de Metodología se movían "a ojo" con transform:translateY(250px)
+   en escritorio y top:440px abajo de 991px. Eso las baja en pantalla pero NO
+   reserva ese espacio en el flujo, así que el pie se colocaba antes de ellas y
+   las tarjetas acababan dibujándose encima y por debajo del pie. Se les quita
+   el empujón para que dónde se ven y dónde están coincidan. */
+.u-containerf {
+  position: relative;
+  top: auto;
+  transform: none;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Mismo caso una capa más adentro: la fila de tarjetas iba bajada 35px con un
+   transform, y esos 35px tampoco existían para el flujo, así que el pie se
+   comía el borde inferior de las tarjetas. */
+.benefits_layoutf {
+  transform: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -235,22 +337,26 @@ body.home .page_wrap_seccion {
   transform: none;
 }
 
+/* El lienzo cubre exactamente el alto del contenedor. Antes medía 100vh a
+   secas y, como el contenedor terminaba un poco antes, sobraba una franja de
+   colores por debajo del pie de página. */
 body.home .canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   max-height: none;
   margin: 0;
   z-index: 0;
 }
 
-/* El header deja de medir 100vh exactos (que empujaba los botones fuera de la
-   pantalla) y reserva el espacio de la fila de botones. */
+/* El header ya no mide un calc() a ojo: se estira para ocupar lo que sobre,
+   así los botones y el pie caen siempre justo al fondo de la ventana. */
 body.home .header {
   transform: none;
-  height: calc(100vh - 190px);
+  flex: 1 1 auto;
+  height: auto;
   min-height: 260px;
   position: relative;
   z-index: 1;
@@ -265,23 +371,52 @@ body.home .logo {
   margin: 0;
 }
 
+/* Los tres botones iban en columnas de ancho fijo (50% / 23%) más angostas que
+   su propio texto: "LO QUE NOS MUEVE" medía 218px dentro de un botón de 137px,
+   así que se salía y se encimaba con "SOLUCIONES". Ahora cada botón abraza su
+   texto y la fila los separa con un hueco real. */
 body.home .container-3 {
   position: relative;
   z-index: 2;
   margin-top: 0;
   padding-left: 1rem;
   padding-right: 1rem;
-  gap: clamp(.5rem, 2vw, 2rem);
+  width: 100%;
+  max-width: min(1100px, 94vw);
+  flex-wrap: wrap;
+  gap: clamp(.75rem, 3vw, 3.5rem);
+}
+
+body.home .columns-4 {
+  width: auto;
+  flex: 0 1 auto;
+  display: flex;
+  gap: clamp(.75rem, 3vw, 3.5rem);
+}
+
+body.home .column-7,
+body.home .column-8,
+body.home .div-block-24 {
+  width: auto;
+  flex: 0 1 auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+body.home .text-block-2 {
+  white-space: nowrap;
 }
 
 body.home .btn-2-w-2 {
+  width: auto;
   height: auto;
   min-height: 64px;
   margin-bottom: 0;
-  padding: .75rem .5rem;
+  padding: .75rem 1.5rem;
   font-size: clamp(.7rem, 1.15vw, 1rem);
   letter-spacing: clamp(1px, .22vw, 3px);
   text-align: center;
+  white-space: nowrap;
 }
 
 body.home .section-23,
@@ -314,9 +449,13 @@ body.home .footersoluciones {
   body.home .column-8,
   body.home .div-block-24 {
     width: 100%;
+    flex: 1 1 auto;
   }
 
+  /* Apilados y todos del mismo ancho: si cada uno abrazara su texto quedarían
+     de tamaños distintos y descuadrados uno debajo del otro. */
   body.home .btn-2-w-2 {
+    width: 100%;
     min-height: 56px;
     margin-bottom: .5rem;
   }
@@ -398,9 +537,32 @@ body.home .footersoluciones {
     transform: none;
   }
 
-  .slider-arrow.cc-prev,
+  /* El bloque del carrusel venía corrido 65px a la izquierda. */
+  .layout {
+    left: 0;
+    width: 100%;
+  }
+
+  /* Las flechas se colocaban con left:50% / right:50% más un transform en
+     píxeles fijos. Al anular ese transform quedaban amontonadas en el centro
+     y encima cruzadas: la de "anterior" salía a la derecha de la de
+     "siguiente", las dos tapando la ficha. Se anclan a los costados. */
+  .slider-arrow {
+    top: 50%;
+    margin-top: 0;
+    transform: translateY(-50%);
+  }
+
+  .slider-arrow.cc-prev {
+    left: 0;
+    right: auto;
+    transform: translateY(-50%);
+  }
+
   .slider-arrow.cc-next {
-    transform: none;
+    left: auto;
+    right: 0;
+    transform: translateY(-50%);
   }
 
   .cta-wrapper {
@@ -434,10 +596,66 @@ body.home .footersoluciones {
     min-width: 0;
   }
 
-  /* La lista de nombres bajo el carrusel es una sola línea larguísima. */
+  /* La lista de nombres bajo el carrusel ("ProcessFlow X · Digital Edge · …")
+     es una sola línea de más de 1000px. En pantallas chicas no cabe de ninguna
+     forma y se desbordaba a lo ancho; el nombre de la solución ya se lee en la
+     ficha y los puntitos indican en cuál vas, así que se oculta. */
+  .carousel-names-wrapper,
   .carousel-names {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   4c-bis. Pantallas más altas que anchas: las flechas, bien separadas
+   --------------------------------------------------------------------------
+   En vertical (celular, o un monitor girado) la ficha se ve angosta y las
+   flechas le quedaban pegadas a los lados. Se abren hasta el borde del
+   carrusel y se achican un poco para no invadir la ficha.                    */
+@media (orientation: portrait) {
+  /* El tamaño se repite en cada modificador a propósito: el CSS original trae
+     .slider-arrow.cc-prev{width:40px} y .cc-next{width:80px}, que pesan más
+     que un .slider-arrow pelón — sin esto las dos flechas salen de distinto
+     tamaño. */
+  .slider-arrow.cc-prev,
+  .slider-arrow.cc-next {
+    width: 54px;
+    height: 54px;
+  }
+
+  .slider-arrow.cc-prev {
+    left: -0.5rem;
+  }
+
+  .slider-arrow.cc-next {
+    right: -0.5rem;
+  }
+
+  /* El chevron mide 100px fijos: dentro de un botón ya reducido se salía por
+     el costado y volvía a provocar desborde horizontal. */
+  .slider-arrow .icon,
+  .slider-arrow .icon svg,
+  .slider-arrow > svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* En un teléfono el espacio a los lados es mínimo: flechas aún más chicas y
+   pegadas al borde, para que quepan sin encimar la ficha. */
+@media (orientation: portrait) and (max-width: 560px) {
+  .slider-arrow.cc-prev,
+  .slider-arrow.cc-next {
+    width: 44px;
+    height: 44px;
+  }
+
+  .slider-arrow.cc-prev {
+    left: -0.75rem;
+  }
+
+  .slider-arrow.cc-next {
+    right: -0.75rem;
   }
 }
 
