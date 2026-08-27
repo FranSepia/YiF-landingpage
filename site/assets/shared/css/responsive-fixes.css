@@ -853,3 +853,26 @@ body.home .footersoluciones {
 #wiam2-embed {
   min-height: 0 !important;
 }
+
+/* --------------------------------------------------------------------------
+   10. Menos aire entre el título de la página y el contenido
+   --------------------------------------------------------------------------
+   Quedaban entre 145 y 165px de vacío bajo el H1 antes de que empezara nada.
+   Venía de dos sitios distintos según la página. */
+
+/* Metodología: el diagrama arrancaba 100px por debajo del título. */
+.section-19 {
+  margin-top: 30px;
+}
+
+/* Lo que nos mueve: el contenedor de las tarjetas mide una pantalla completa
+   (min-height:100svh) y centra su contenido en vertical, así que las tarjetas
+   caían al medio y dejaban un hueco enorme arriba. Que midan lo suyo y se
+   apoyen arriba. */
+.u-container {
+  min-height: 0;
+  justify-content: flex-start;
+  /* Sin nada de padding las tarjetas quedaban pegadas al título (25px). Este
+     respiro las deja a ~70px, en línea con el resto de las páginas. */
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+}
