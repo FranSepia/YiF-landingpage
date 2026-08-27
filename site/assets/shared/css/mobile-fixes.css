@@ -218,6 +218,30 @@
     background: rgba(0, 0, 0, 0.5) !important;
   }
 
+  /* --- El video de fondo, centrado en la tarjeta ---------------------------
+     El contenedor del video (.w-background-video) trae `height:500px` fijo de
+     Webflow. En escritorio da igual porque la tarjeta mide justo eso, pero en
+     movil la tarjeta mide 200px: el contenedor sobresale 300px por abajo y,
+     como esta anclado arriba (inset:0), lo que se ve recortado es la franja
+     superior del video. Por eso Mision y Vision mostraban el cielo en vez del
+     motivo central.
+
+     Con height:100% el contenedor mide lo mismo que la tarjeta y el encuadre
+     vuelve al centro: el video ya viene con object-fit:cover y centrado por
+     `margin:auto` sobre `inset:-100%`, asi que no hay que tocar nada mas.
+     Tambien arregla el hueco que quedaba abajo al abrir una tarjeta y crecer
+     de alto mas de 500px. */
+  body .benefits_card_wrap .w-background-video {
+    height: 100% !important;
+    inset: 0 !important;
+  }
+  /* El <video> ya es cover; se deja el encuadre explicito por si alguna
+     tarjeta futura hereda otro object-position. */
+  body .benefits_card_wrap .w-background-video > video {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
   /* --- Anular el :hover en móvil ------------------------------------------
      iOS simula el hover con el primer toque y se queda pegado: la tarjeta
      tocada se ensanchaba al 1500%, se ponía negra y las otras dos bajaban a
