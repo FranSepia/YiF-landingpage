@@ -920,3 +920,62 @@ body.home .columns-4::after {
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* --------------------------------------------------------------------------
+   13. Soluciones en móvil: la tarjeta se ve completa y con su texto
+   --------------------------------------------------------------------------
+   La descripción de cada tarjeta (.slide-content_text-wrapper) nace con
+   opacity:0 y sólo se enciende con :hover. En un teléfono no hay cursor, así
+   que ese texto no aparecía NUNCA: la tarjeta se quedaba con el título y nada
+   más.
+
+   Con (hover: none) esto se aplica sólo a pantallas táctiles; en escritorio el
+   comportamiento sigue siendo el de siempre (aparece al pasar el cursor).
+
+   Los selectores llevan .swiper y .swiper-slide de más a propósito: el HTML de
+   la página trae, DESPUÉS de esta hoja, un
+   ".swiper-slide-active .slide-gradient{background:none!important}". Con la
+   misma especificidad ganaría esa por ir más abajo, y el velo oscuro no se
+   pintaría: el texto blanco quedaría ilegible sobre la imagen clara. */
+@media (hover: none) {
+  .swiper .swiper-slide.swiper-slide-active .slide-content_text-wrapper {
+    opacity: 1;
+  }
+
+  .swiper .swiper-slide.swiper-slide-active .slide-content {
+    min-height: 100%;
+  }
+
+  .swiper .swiper-slide.swiper-slide-active .slide-gradient {
+    background: var(--overlay-active) !important;
+    background-image: none !important;
+  }
+
+  .swiper .swiper-slide.swiper-slide-active .slide-content_title h2 {
+    color: #fff !important;
+  }
+}
+
+/* La tarjeta activa necesita alto para su texto: en el móvil el carrusel se
+   queda en 410px y la descripción se cortaba. */
+@media screen and (max-width: 767px) {
+  .swiper,
+  .swiper-component,
+  .slider-wrapper {
+    max-height: none;
+  }
+
+  .swiper {
+    height: auto;
+    min-height: 470px;
+  }
+}
+
+/* El subtítulo de la tarjeta usa --title-active (#456376, azul oscuro), que se
+   lee bien sobre la imagen clara pero desaparece sobre el velo negro que se
+   pone al abrir la tarjeta en táctil. */
+@media (hover: none) {
+  .swiper .swiper-slide.swiper-slide-active .slide-content_text-wrapper h3 {
+    color: #fff !important;
+  }
+}

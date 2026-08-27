@@ -437,7 +437,16 @@ document.addEventListener('DOMContentLoaded', function () {
 	const swiper = new Swiper(".swiper", {
 		grabCursor: true,
 		slideToClickedSlide: true,
-		slidesPerView: 5,
+		// Antes era slidesPerView: 5 fijo. En un celular el carrusel mide unos
+		// 350px, asi que cada tarjeta quedaba en 70px: una tira delgada donde
+		// no cabia el contenido. Ahora el numero de tarjetas visibles depende
+		// del ancho, y en escritorio (>=992px) siguen siendo 5 como antes.
+		slidesPerView: 1,
+		breakpoints: {
+			480: { slidesPerView: 2 },
+			768: { slidesPerView: 3 },
+			992: { slidesPerView: 5 }
+		},
 		centeredSlides: true,
 		loop: true,
 		speed: 600,
@@ -508,8 +517,14 @@ document.addEventListener('DOMContentLoaded', function () {
 /* Y&iF: (1) agranda la TARJETA COMPLETA activa (marco+imagen+texto, proporcional)
          (2) clic en cualquier tarjeta lateral -> la centra (atraviesa zonas .area-*) */
 (function(){
-  var SCALE = 1.20;   /* factor de tamaño de la tarjeta central: sube/baja aquí */
-  var LIFT  = 48;     /* cuánto se eleva la tarjeta (px) para no tapar el texto de abajo */
+  /* En escritorio se ven cinco tarjetas y la del centro se agranda un 20% y
+     se eleva para destacar. En un teléfono sólo se ve UNA: agrandarla la
+     sacaba del carrusel por los lados y ~95px por arriba, encimándose con lo
+     que hay encima. Ahí va a tamaño real y sin elevar. */
+  function metrics(){
+    var chico = window.matchMedia('(max-width: 767px)').matches;
+    return chico ? { scale: 1, lift: 0 } : { scale: 1.20, lift: 48 };
+  }
   function start(){
     var el = document.querySelector('.swiper');
     var sw = el && el.swiper;
@@ -524,7 +539,8 @@ document.addEventListener('DOMContentLoaded', function () {
         var s = slides[i];
         var t = (s.style.transform || '').replace(/\s*(translateY|scale)\([^)]*\)/g,'');
         s.style.transformOrigin = 'center center';
-        s.style.transform = t + ' translateY(-' + LIFT + 'px) scale(' + SCALE + ')';
+        var m = metrics();
+        s.style.transform = t + ' translateY(-' + m.lift + 'px) scale(' + m.scale + ')';
       }
     }
     sw.on('setTranslate', applyScale);
