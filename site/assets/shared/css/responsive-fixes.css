@@ -764,3 +764,92 @@ body.home .footersoluciones {
     padding-right: 1rem;
   }
 }
+
+/* --------------------------------------------------------------------------
+   7. Soluciones — tarjeta "SmartTech Integration"
+   --------------------------------------------------------------------------
+   Cada tarjeta acomoda su subtítulo y su texto con un translateY distinto,
+   puesto a ojo en Webflow. En SmartTech el subtítulo baja 60px y el texto sólo
+   5px, así que el texto arrancaba 16px ANTES de que terminara el subtítulo y
+   los renglones se encimaban. Con 36px queda el mismo respiro (~7px) que en
+   las otras diez tarjetas. Revisadas las once: era la única con este defecto.  */
+.text-md.cc-dark.smartech {
+  transform: translateY(36px);
+}
+
+/* --------------------------------------------------------------------------
+   8. Metodología — las tres tarjetas de pilares
+   -------------------------------------------------------------------------- */
+
+/* El widget de órbitas se dibuja 70px más arriba de donde realmente ocupa
+   sitio (translateY(-70px)), así que debajo quedaba un hueco fantasma: se veía
+   un vacío de ~100px antes de las tarjetas. Sin ese empujón, dónde se ve y
+   dónde está coinciden. */
+.section-19 {
+  transform: none;
+}
+
+/* Menos aire arriba y más abajo, que es donde las tarjetas necesitan sitio
+   para abrirse. */
+.u-containerf {
+  margin-top: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+/* Sin esto, al reservar alto para la tarjeta abierta el "stretch" de flex
+   estiraría las tres hasta abajo; deben conservar su alto y dejar el espacio
+   libre por debajo. */
+.benefits_layoutf {
+  align-items: flex-start;
+}
+
+/* La tarjeta señalada se queda abierta al quitar el cursor (la clase la pone
+   assets/shared/js/pillar-cards.js). Se repiten aquí las mismas reglas que el
+   :hover del propio HTML, pero atadas a la clase para que persistan. */
+@container (width > 55em) {
+  .benefits_card_wrapf.is-open {
+    width: 150%;
+  }
+
+  .benefits_card_wrapf.is-open .benefits_card_mask_wrapf {
+    grid-template-rows: 1fr;
+  }
+}
+
+@container (width < 55em) {
+  .benefits_card_wrapf.is-open {
+    width: 112%;
+    height: 1500%;
+  }
+
+  .benefits_card_wrapf.is-open .benefits_card_mask_wrapf {
+    grid-template-rows: 1fr;
+  }
+}
+
+/* Mientras el script mide cuánto ocupa cada tarjeta abierta, las animaciones
+   se apagan: si no, mediría un tamaño intermedio de la transición. */
+.benefits_layoutf.yf-measuring,
+.benefits_layoutf.yf-measuring * {
+  transition: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. El contenido debe llenar al menos una pantalla
+   --------------------------------------------------------------------------
+   En Contacto el bloque medía 800px en una ventana de 900: el pie aparecía sin
+   hacer scroll y encima tapaba el botón "Enviar", que terminaba 13px más abajo
+   que el propio bloque. Con height:auto el bloque contiene su formulario, y
+   con min-height de una pantalla el pie queda fuera de vista hasta que se baja. */
+.page_wrap_seccion {
+  height: auto;
+  min-height: 100vh;
+}
+
+/* El diagrama de órbitas se declara con min-height:100vh en un style= dentro
+   del propio HTML, pero su contenido mide ~673px: sobraban unos 230px de vacío
+   entre el diagrama y las tarjetas de pilares. Va con !important porque un
+   estilo en línea le gana a cualquier hoja. */
+#wiam2-embed {
+  min-height: 0 !important;
+}
