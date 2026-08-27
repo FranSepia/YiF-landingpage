@@ -27,35 +27,74 @@
     overflow-x: clip;
   }
 
-  /* --- Footer -------------------------------------------------------------
-     Traía translateY(150px) para compensar un desplazamiento falso del
-     contenido, y sus columnas colapsaban a ~0px de alto (son flex-item y
-     flex-container a la vez). Se saca todo del flex y se apila en bloque. */
+  /* --- Footer: el mismo en todas las páginas -------------------------------
+     El pie de "Lo que nos mueve" (.section-22 > .columns-5) queda en una sola
+     fila compacta de ~100px: los cinco datos en línea y la dirección debajo.
+     Los demás se veían distintos por dos motivos:
+
+       - .columns-7 (contacto) viene con flex-flow:column desde Webflow, así
+         que apilaba sus cinco columnas una debajo de otra.
+       - una corrección anterior de este archivo forzaba display:block en los
+         pies de soluciones y contacto. Se metió porque esas secciones eran
+         position:absolute con translateY y sus columnas colapsaban a ~0px de
+         alto; pero el que arregla eso de verdad es el bloque de posición de
+         aquí abajo, no el apilado.
+
+     Con la posición ya corregida, se les da la misma geometría que a la
+     ourwhy y los cuatro pies quedan idénticos. .section-26 (metodología) ya
+     usaba fila, por eso no aparece aquí. */
   .section-23.footersoluciones,
   .section-24.footercontacto {
     position: static;
     transform: none;
+    /* alto automático para que nunca recorte, pero con el mismo mínimo que
+       .section-22 y .section-26 (100px fijos) para que los cuatro midan igual */
     height: auto;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
   }
+  /* Igual que .container-16 en la página de ourwhy. */
   .footersoluciones .w-container,
   .footercontacto .w-container {
-    display: block;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
     height: auto;
   }
+  /* Igual que .columns-5: una sola fila centrada. Basta con la especificidad
+     de dos clases para ganarle al flex-flow:column de .columns-7. */
   .footersoluciones .columns-6,
   .footercontacto .columns-7 {
-    display: block;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+    grid-column-gap: 8px;
+    grid-row-gap: 8px;
+    width: 100%;
+    margin: 20px 0;
   }
+  /* Las columnas conservan el width:100% que Webflow les pone en móvil; como
+     son flex-items se reparten el ancho encogiéndose, que es exactamente lo
+     que hace la ourwhy. Sólo se centra su contenido. */
   .footersoluciones .w-col,
   .footercontacto .w-col {
-    width: 100%;
-    padding-top: 6px;
-    padding-bottom: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 0;
+    padding-right: 0;
   }
   /* el renglón de la dirección salía del flujo con bottom:-200px */
   .footercontacto .text-block-19 {
     position: static;
     bottom: auto;
+    /* Los otros tres pies usan 8px; éste venía en 12px/15px, y por eso se veía
+       más alto y con la dirección en tres renglones en vez de dos. */
+    font-size: 8px;
+    line-height: 8px;
   }
 
   /* --- "Lo que nos mueve": tarjetas Misión / Our Why / Visión --------------
