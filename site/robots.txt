@@ -1,4 +1,16 @@
+# Y&iF — https://www.why-and-if.solutions
+# Todo el sitio es público: buscadores y asistentes de IA pueden rastrearlo.
+
 User-agent: *
-Disallow:
+Allow: /
+
+# Estas dos no aportan nada: una está vacía y la otra es una copia de
+# /soluciones. Llevan noindex en su HTML; aquí se evita además el rastreo.
+Disallow: /aliados-expertos
+Disallow: /soluciones-copy
+
+# Los assets deben poder rastrearse o Google no puede renderizar la página
+# y la evalúa como si estuviera rota.
+Allow: /assets/
 
 Sitemap: https://www.why-and-if.solutions/sitemap.xml

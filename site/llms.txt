@@ -1,0 +1,52 @@
+# Y&iF (Why and If)
+
+> Consultoría de innovación tecnológica con propósito, con sede en Ciudad de
+> México. Integra estrategia, ingeniería y desarrollo de software a la medida
+> para acompañar a organizaciones en procesos de transformación digital, desde
+> la definición del problema hasta la puesta en producción.
+
+Y&iF opera bajo el lema "Purpose Driven Tech": tecnología con propósito y
+resultados medibles. Trabaja con sector público, corporativo y empresas,
+sector educativo, y tecnología y startups.
+
+## Metodología
+
+El **Why Innovation Atomic Model (WIAM)** es el modelo propio de Y&iF. Organiza
+el trabajo en seis órbitas alrededor de un núcleo de objetivos estratégicos:
+
+- **Why** — contexto y síntoma prioritario: por qué actuar ahora, para quién y con qué límites.
+- **If** — deseabilidad, factibilidad y viabilidad: validar antes de construir.
+- **How** — plan ejecutable y arquitectura mínima: roadmap, dueños, riesgos y criterios de aceptación.
+- **Do** — entrega en ciclos con calidad y seguridad.
+- **Learn** — evidencia accionable para mejorar de forma continua.
+- **Innovation** — lanzamiento, escalamiento y captura de conocimiento.
+
+## Soluciones
+
+- **Innovate Blueprint** — estrategia y cultura de innovación.
+- **TechFlow Management** — dirección de proyectos tecnológicos.
+- **Zero-to-Launch** — creación y validación de productos.
+- **CodeCraft** — desarrollo de software a la medida.
+- **Digital Edge** — transformación digital estratégica.
+- **Innovation Academy** — formación ejecutiva en innovación.
+- **SmartTech Integration** — integración de tecnologías avanzadas.
+- **ProcessFlow X** — optimización y automatización de procesos.
+- **PatentForge** — desarrollo y gestión de patentes desde cero.
+- **MarketLens** — inteligencia de mercado y tendencias tecnológicas.
+- **StorySpark** — narrativa y comunicación de producto.
+
+## Páginas
+
+- [Inicio](https://www.why-and-if.solutions/): presentación de la consultoría.
+- [Lo que nos mueve](https://www.why-and-if.solutions/ourwhy): misión, visión y propósito.
+- [Soluciones](https://www.why-and-if.solutions/soluciones): las once soluciones, con su descripción.
+- [Metodología Y&iF](https://www.why-and-if.solutions/why-innovation-atomic-model): el modelo WIAM en detalle, con preguntas clave y herramientas por órbita.
+- [Contacto](https://www.why-and-if.solutions/contacto): formulario para iniciar una conversación.
+
+## Contacto
+
+- Correo: contacto@why-and-if.solutions
+- Teléfono: +52 55 4748 0723
+- WhatsApp: +52 55 7009 9790
+- Dirección: Monte Elbruz 124, Piso 2, Int. 212-B, Lomas de Chapultepec III Secc., Miguel Hidalgo, C.P. 11000, Ciudad de México, México
+- Idiomas: español e inglés (el sitio tiene un selector ES/EN).

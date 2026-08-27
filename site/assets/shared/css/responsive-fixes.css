@@ -876,3 +876,47 @@ body.home .footersoluciones {
      respiro las deja a ~70px, en línea con el resto de las páginas. */
   padding-top: clamp(2.5rem, 5vw, 4.5rem);
 }
+
+/* --------------------------------------------------------------------------
+   11. Home: los tres botones, separados por igual
+   --------------------------------------------------------------------------
+   "Lo que nos mueve" y "Soluciones" viven dentro de .columns-4, y "Contacto"
+   es hermano de ese bloque. Resultado: entre los dos primeros mediaba el hueco
+   de .columns-4, y entre el segundo y el tercero ese mismo hueco MÁS el ancho
+   sobrante de .columns-4 (56px contra 102px a 1920px de ancho).
+
+   Con display:contents la caja de .columns-4 desaparece y sus dos botones pasan
+   a ser hijos directos de la fila, así que el único hueco que manda es el de
+   .container-3 y los tres quedan a la misma distancia. */
+body.home .columns-4 {
+  display: contents;
+}
+
+/* Los ::before/::after de clearfix de Webflow sí siguen generándose aunque el
+   padre sea display:contents, y se colarían como dos elementos fantasma en la
+   fila, descuadrando otra vez el reparto. */
+body.home .columns-4::before,
+body.home .columns-4::after {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   12. Encabezado accesible del home
+   --------------------------------------------------------------------------
+   La portada no tenía ningún <h1>: su título es el logotipo, que es una
+   imagen, así que para un buscador la página no decía de qué trata. Este h1
+   existe en el HTML y lo leen buscadores y lectores de pantalla, pero no se
+   ve: se saca del área visible en vez de usar display:none, porque lo que
+   está oculto con display:none no se anuncia. */
+.yf-sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
