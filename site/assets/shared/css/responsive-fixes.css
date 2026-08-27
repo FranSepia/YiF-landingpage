@@ -979,3 +979,31 @@ body.home .columns-4::after {
     color: #fff !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   14. Soluciones: menos aire entre el título y el carrusel
+   --------------------------------------------------------------------------
+   Entre el H1 y el carrusel había 201px en el teléfono y 164px en escritorio.
+   Venía de .slider-wrapper (margin-top:110px, que en móvil sube a 185px) más
+   el padding-top:6vh de .section.
+
+   Se separa por tamaño a propósito: arriba de 767px el script eleva la tarjeta
+   48px, así que el hueco que se VE es 48px menor que el que se mide; abajo de
+   767px no hay elevación y el hueco medido es el real. */
+.slider-wrapper {
+  margin-top: 5.5rem;
+}
+
+.section {
+  padding-top: 1.5rem;
+}
+
+@media screen and (max-width: 767px) {
+  .slider-wrapper {
+    margin-top: 2.5rem;
+  }
+
+  .section {
+    padding-top: 1rem;
+  }
+}

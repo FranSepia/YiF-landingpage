@@ -18,11 +18,11 @@
 .swiper .swiper-wrapper{ opacity: 0; }
 .swiper.yif-ready .swiper-wrapper{ opacity: 1; transition: opacity .18s ease; }
 
-/* Y&iF: en móvil la tarjeta activa se agranda (scale 1.2) y esa expansión la
-   hacía invadir el título "Soluciones" por arriba. Se baja el carrusel. */
-@media screen and (max-width:767px){
-  .slider-wrapper{ margin-top:185px; }
-}
+/* Y&iF: aquí había un margin-top:185px para móvil. Era un parche contra la
+   tarjeta escalada 1.2, que invadía el título "Soluciones" por arriba; ahora
+   en móvil la tarjeta ya no se escala (ver metrics() en #yif-swiper-extra),
+   así que ese margen sólo dejaba un hueco enorme bajo el título. El espaciado
+   vive en responsive-fixes.css. */
 
 /* Y&iF: el footer traía un translateY(150px) exclusivo de móvil que lo
    desprendía de su lugar natural, dejando un hueco enorme antes y después.
@@ -441,7 +441,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		// 350px, asi que cada tarjeta quedaba en 70px: una tira delgada donde
 		// no cabia el contenido. Ahora el numero de tarjetas visibles depende
 		// del ancho, y en escritorio (>=992px) siguen siendo 5 como antes.
-		slidesPerView: 1,
+		// 1.15 en vez de 1: la tarjeta deja de medir exactamente el ancho de la
+		// pantalla y se asoma un poco la siguiente, que ademas insinua que hay mas.
+		slidesPerView: 1.15,
 		breakpoints: {
 			480: { slidesPerView: 2 },
 			768: { slidesPerView: 3 },
