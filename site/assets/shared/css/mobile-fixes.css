@@ -302,6 +302,29 @@
     letter-spacing: normal !important;
   }
 
+  /* --- Contacto: juntar título, subtítulo y formulario ---------------------
+     Entre el subtitulo ("Da el primer paso hacia tu proyecto") y el formulario
+     quedaban 130px de aire. Salen de `margin-top:170px` en .section-17, que
+     viene de una correccion anterior: el original empujaba la seccion 150px
+     con top:100px + translateY(50px) sin ocupar sitio en el layout, y eso se
+     convirtio en margen real para que el pie no se le encimara. El margen real
+     hacia falta; 170px, no. Con 80px el hueco baja a 40px.
+
+     El subtitulo sube un poco tambien (de -40px a -20px). Ojo con esto: su
+     desplazamiento no ocupa espacio, asi que subirlo agranda el hueco de abajo
+     en la misma medida; por eso el margen del formulario baja otros 20px, de
+     80 a 60. Resultado: ~43px arriba y ~40px abajo, en vez de 63 y 40.
+
+     Va con `body` delante porque la regla de los 170px vive en un <style>
+     dentro de contacto.html, posterior a este archivo: con una clase sola
+     perderia por orden de carga, con `body` gana por especificidad. */
+  body .section-17 {
+    margin-top: 60px;
+  }
+  body .text-block-9 {
+    bottom: -20px;
+  }
+
   /* --- Restos de ancho que alimentaban el zoom-out ------------------------
      El carrusel de soluciones mide 1200px por diseño y la fila de nombres es
      una lista larguísima; ambos sobresalen del ancho del teléfono. Recortarlos
