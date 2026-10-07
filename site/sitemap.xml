@@ -92,6 +92,60 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.why-and-if.solutions/soluciones/agentes-de-ia</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/agentes-de-ia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/ai-agents"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/agentes-de-ia"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.why-and-if.solutions/en/solutions/ai-agents</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/agentes-de-ia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/ai-agents"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/agentes-de-ia"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.why-and-if.solutions/soluciones/rpa</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/rpa"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/rpa"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/rpa"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.why-and-if.solutions/en/solutions/rpa</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/rpa"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/rpa"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/rpa"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.why-and-if.solutions/soluciones/desarrollo-de-software</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/desarrollo-de-software"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/software-development"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/desarrollo-de-software"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.why-and-if.solutions/en/solutions/software-development</loc>
+    <xhtml:link rel="alternate" hreflang="es-MX" href="https://www.why-and-if.solutions/soluciones/desarrollo-de-software"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.why-and-if.solutions/en/solutions/software-development"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.why-and-if.solutions/soluciones/desarrollo-de-software"/>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.why-and-if.solutions/tarjetas/y-and-if</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>yearly</changefreq>

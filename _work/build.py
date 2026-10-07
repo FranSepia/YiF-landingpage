@@ -103,6 +103,18 @@ PAGINAS = [
     {'archivo': 'contacto.html', 'url': '/contacto', 'tipo': 'ContactPage',
      'miga': 'Contacto', 'freq': 'monthly', 'prioridad': '0.8',
      'en': {'archivo': 'en/contact.html', 'url': '/en/contact', 'miga': 'Contact'}},
+    # Páginas de servicio: cuelgan de Soluciones (migas de 3 niveles) y su
+    # JSON-LD lleva un nodo Service con el H1 y el párrafo de introducción.
+    {'archivo': 'soluciones/agentes-de-ia.html', 'url': '/soluciones/agentes-de-ia', 'tipo': 'WebPage',
+     'miga': 'Agentes de IA', 'servicio': True, 'freq': 'monthly', 'prioridad': '0.8',
+     'en': {'archivo': 'en/solutions/ai-agents.html', 'url': '/en/solutions/ai-agents', 'miga': 'AI agents'}},
+    {'archivo': 'soluciones/rpa.html', 'url': '/soluciones/rpa', 'tipo': 'WebPage',
+     'miga': 'Automatización RPA', 'servicio': True, 'freq': 'monthly', 'prioridad': '0.8',
+     'en': {'archivo': 'en/solutions/rpa.html', 'url': '/en/solutions/rpa', 'miga': 'RPA automation'}},
+    {'archivo': 'soluciones/desarrollo-de-software.html', 'url': '/soluciones/desarrollo-de-software',
+     'tipo': 'WebPage', 'miga': 'Software a la medida', 'servicio': True, 'freq': 'monthly', 'prioridad': '0.8',
+     'en': {'archivo': 'en/solutions/software-development.html', 'url': '/en/solutions/software-development',
+            'miga': 'Custom software'}},
     {'archivo': 'tarjetas/y-and-if.html', 'url': '/tarjetas/y-and-if', 'tipo': 'WebPage',
      'miga': 'Tarjeta digital', 'freq': 'yearly', 'prioridad': '0.3'},
     {'archivo': 'tarjetas/humberto-gonzalez-olmos.html', 'url': '/tarjetas/humberto-gonzalez-olmos',
@@ -243,6 +255,34 @@ def tarjetas_de_texto(archivo, lang='es'):
     return salida
 
 
+def servicio_md(archivo):
+    """Una página de servicio (/soluciones/...) en Markdown: (H1, intro, cuerpo)."""
+    s = leer(archivo)
+    h1 = texto(re.search(r'<h1' + ATTRS + r'>(.*?)</h1>', s, re.S).group(2))
+    intro = texto(re.search(r'<p class="yf-servicio-intro"' + ATTRS + r'>(.*?)</p>', s, re.S).group(2))
+    sec = re.search(r'<section class="yf-servicio">(.*?)</section>', s, re.S).group(1)
+    sec = re.sub(r'<nav class="yf-relacionadas".*?</nav>', '', sec, flags=re.S)
+    sec = re.sub(r'<div class="yf-panel yf-cta">.*?</div>', '', sec, flags=re.S)
+    salida = []
+    for m in re.finditer(r'<(h2|p|ul|table)' + ATTRS + r'>(.*?)</\1>', sec, re.S):
+        etiqueta, cuerpo = m.group(1), m.group(3)
+        if 'yf-servicio-intro' in m.group(2):
+            continue
+        if etiqueta == 'h2':
+            salida += ['#### ' + texto(cuerpo), '']
+        elif etiqueta == 'p':
+            salida += [texto(cuerpo), '']
+        elif etiqueta == 'ul':
+            salida += ['- ' + texto(li) for _, li in re.findall(r'<li' + ATTRS + r'>(.*?)</li>', cuerpo, re.S)] + ['']
+        else:
+            filas = [[texto(c) for _, c in re.findall(r'<t[hd]' + ATTRS + r'>(.*?)</t[hd]>', f, re.S)]
+                     for f in re.findall(r'<tr\b[^>]*>(.*?)</tr>', cuerpo, re.S)]
+            salida.append('| ' + ' | '.join(filas[0]) + ' |')
+            salida.append('|' + '---|' * len(filas[0]))
+            salida += ['| ' + ' | '.join(f) + ' |' for f in filas[1:]] + ['']
+    return h1, intro, '\n'.join(salida).strip()
+
+
 def servicios():
     """Las 11 soluciones de site/soluciones.html: nombre, subtítulo, texto."""
     s = leer('soluciones.html')
@@ -318,12 +358,19 @@ def sitio_web():
             'publisher': {'@id': ORG_ID}}
 
 
-def migas(url, nombre, lang='es'):
-    inicio = ('Home', DOMINIO + '/en/') if lang == 'en' else ('Inicio', DOMINIO + '/')
+def migas(url, nombre, lang='es', padre=None):
+    """Inicio › [padre ›] página. `padre` es (nombre, url) para las páginas
+    que cuelgan de otra, como los servicios de Soluciones."""
+    pasos = [('Home', DOMINIO + '/en/') if lang == 'en' else ('Inicio', DOMINIO + '/')]
+    if padre:
+        pasos.append((padre[0], DOMINIO + padre[1]))
+    pasos.append((nombre, DOMINIO + url))
     return {'@type': 'BreadcrumbList', '@id': DOMINIO + url + '#migas', 'itemListElement': [
-        {'@type': 'ListItem', 'position': 1, 'name': inicio[0], 'item': inicio[1]},
-        {'@type': 'ListItem', 'position': 2, 'name': nombre, 'item': DOMINIO + url},
-    ]}
+        {'@type': 'ListItem', 'position': i, 'name': n, 'item': u} for i, (n, u) in enumerate(pasos, 1)]}
+
+
+def pagina_por_archivo(archivo):
+    return next(q for q in PAGINAS if q['archivo'] == archivo)
 
 
 def grafo(p, s=None, lang='es'):
@@ -341,8 +388,23 @@ def grafo(p, s=None, lang='es'):
     }
     nodos = [organizacion(lang), sitio_web(), pagina]
     if p['url'] != '/':
+        padre = None
+        if p.get('servicio'):
+            sol = pagina_por_archivo('soluciones.html')
+            padre = (sol['en']['miga'], sol['en']['url']) if en else (sol['miga'], sol['url'])
         pagina['breadcrumb'] = {'@id': url + '#migas'}
-        nodos.append(migas(ruta, p['en']['miga'] if en else p['miga'], lang))
+        nodos.append(migas(ruta, p['en']['miga'] if en else p['miga'], lang, padre))
+
+    if p.get('servicio'):
+        h1 = re.search(r'<h1' + ATTRS + r'>(.*?)</h1>', s, re.S)
+        intro = re.search(r'<p class="yf-servicio-intro"' + ATTRS + r'>(.*?)</p>', s, re.S)
+        nodos.append({
+            '@type': 'Service', '@id': url + '#servicio', 'name': texto(h1.group(2)),
+            'serviceType': p['en']['miga'] if en else p['miga'],
+            'description': texto(intro.group(2)), 'provider': {'@id': ORG_ID},
+            'areaServed': zona(lang), 'url': url,
+        })
+        pagina['mainEntity'] = {'@id': url + '#servicio'}
 
     if p['archivo'] == 'soluciones.html':
         nodos.append({
@@ -607,6 +669,11 @@ def generar_llms():
          '', '## Soluciones', '']
     for s_ in sv:
         l.append('- [%s](%s): %s. %s' % (s_['nombre'], url('/soluciones'), s_['subtitulo'], s_['texto']))
+    l += ['', '## Servicios de IA y software', '']
+    for q in PAGINAS:
+        if q.get('servicio'):
+            h1, intro, _ = servicio_md(q['archivo'])
+            l.append('- [%s](%s): %s' % (h1, url(q['url']), intro))
     l += ['', '## Metodología', '',
           '- [Why Innovation Atomic Model (WIAM)](%s): modelo propio de Y&iF que organiza la '
           'innovación en seis órbitas alrededor de un núcleo de objetivos estratégicos: %s.'
@@ -648,6 +715,11 @@ def generar_llms():
     f += ['## Soluciones', '', 'Página: ' + url('/soluciones'), '']
     for s_ in sv:
         f += ['### %s — %s' % (s_['nombre'], s_['subtitulo']), '', s_['texto'], '']
+    f += ['## Servicios de IA y software', '']
+    for q in PAGINAS:
+        if q.get('servicio'):
+            h1, intro, cuerpo = servicio_md(q['archivo'])
+            f += ['### ' + h1, '', 'Página: ' + url(q['url']), '', intro, '', cuerpo, '']
     f += ['## Metodología: Why Innovation Atomic Model (WIAM)', '',
           'Página: ' + url('/why-innovation-atomic-model'), '']
     for titulo, cuerpo in tarjetas_de_texto('why-innovation-atomic-model.html'):

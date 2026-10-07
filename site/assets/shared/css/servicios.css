@@ -1,0 +1,233 @@
+/* Páginas de servicio (/soluciones/agentes-de-ia, /soluciones/rpa,
+   /soluciones/desarrollo-de-software) y la fila de enlaces a ellas en
+   /soluciones. Mismo lenguaje que el resto del sitio: fondo negro con fluido,
+   Montserrat y paneles de vidrio como la barra de navegación. */
+
+.yf-servicio {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  max-width: 1000px;
+  margin: 28px 0 0;
+  padding: 0 clamp(1rem, 4vw, 40px) 80px;
+  color: #fff;
+  font-family: Montserrat, sans-serif;
+}
+
+.yf-servicio-intro {
+  max-width: 780px;
+  margin: 0 0 36px;
+  font-size: clamp(16px, 1.25vw, 18px);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, .88);
+}
+
+.yf-panel {
+  margin: 0 0 22px;
+  padding: 26px 30px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .04);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.yf-panel h2 {
+  margin: 0 0 14px;
+  font-size: clamp(20px, 1.8vw, 24px);
+  line-height: 1.3;
+  font-weight: 600;
+  color: #fff;
+}
+
+.yf-panel p,
+.yf-panel li {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, .85);
+}
+
+.yf-panel p {
+  margin: 0 0 12px;
+}
+
+.yf-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.yf-panel ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.yf-panel li + li {
+  margin-top: 6px;
+}
+
+/* Tablas: en celular se desplazan de lado dentro del panel, sin mover la página. */
+.yf-tabla-scroll {
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.yf-tabla-scroll:last-child {
+  margin-bottom: 0;
+}
+
+.yf-tabla {
+  width: 100%;
+  min-width: 540px;
+  border-collapse: collapse;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.yf-tabla th,
+.yf-tabla td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  text-align: left;
+  vertical-align: top;
+  color: rgba(255, 255, 255, .85);
+}
+
+.yf-tabla thead th {
+  color: #fff;
+  font-weight: 600;
+  border-bottom-color: rgba(255, 255, 255, .3);
+}
+
+.yf-tabla tbody th {
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.yf-tabla tr:last-child th,
+.yf-tabla tr:last-child td {
+  border-bottom: 0;
+}
+
+.yf-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.yf-panel .yf-cta-texto {
+  margin: 0;
+  font-size: clamp(18px, 1.6vw, 21px);
+  font-weight: 600;
+  color: #fff;
+}
+
+.yf-boton,
+.yf-servicios-links a {
+  display: inline-block;
+  padding: .75rem 1.5rem;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  color: #fff;
+  font-family: Montserrat, sans-serif;
+  font-size: 15px;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+.yf-boton:hover,
+.yf-boton:focus-visible,
+.yf-servicios-links a:hover,
+.yf-servicios-links a:focus-visible {
+  background: #fff;
+  color: #000;
+}
+
+.yf-relacionadas {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, .7);
+}
+
+.yf-relacionadas a {
+  color: #fff;
+}
+
+/* Fila de enlaces bajo el carrusel de /soluciones. Va dentro de .layout,
+   justo después de .slider-wrapper; el margen superior libra los puntos de
+   paginación, que están en position:absolute debajo del carrusel. */
+.yf-servicios-links {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 56px auto 0;
+  padding: 0 1rem;
+}
+
+.yf-servicios-links a {
+  padding: .6rem 1.25rem;
+  font-size: 14px;
+}
+
+@media (max-width: 767px) {
+  .yf-panel {
+    padding: 22px 20px;
+  }
+  .yf-panel p,
+  .yf-panel li {
+    font-size: 15px;
+  }
+
+  /* Tablas apiladas en celular: cada fila es un bloque con su título y cada
+     celda lleva delante el encabezado de su columna (data-label). Los role=
+     del HTML conservan la semántica de tabla para lectores de pantalla. */
+  .yf-tabla {
+    min-width: 0;
+  }
+  .yf-tabla,
+  .yf-tabla tbody,
+  .yf-tabla tr,
+  .yf-tabla th,
+  .yf-tabla td {
+    display: block;
+  }
+  .yf-tabla thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+  }
+  .yf-tabla tr {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+  }
+  .yf-tabla tr:first-child {
+    padding-top: 0;
+  }
+  .yf-tabla tr:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .yf-tabla tbody th,
+  .yf-tabla td {
+    padding: 3px 0;
+    border: 0;
+    white-space: normal;
+  }
+  .yf-tabla tbody th {
+    margin-bottom: 4px;
+  }
+  .yf-tabla td::before {
+    content: attr(data-label) ": ";
+    font-weight: 600;
+    color: #fff;
+  }
+}

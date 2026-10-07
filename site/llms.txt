@@ -27,6 +27,12 @@ Datos clave:
 - [Patent Forge](https://www.why-and-if.solutions/soluciones): Desarrollo y Gestión de Patentes desde Cero. Creamos, documentamos y registramos tus patentes desde la idea inicial. Para que tu innovación esté protegida y sea 100% tuya.
 - [Zero to Launch](https://www.why-and-if.solutions/soluciones): Creación y Validación de Productos. Llevamos tu idea desde un boceto hasta un producto probado y listo para lanzar. Para que inviertas solo en lo que realmente tiene potencial.
 
+## Servicios de IA y software
+
+- [Desarrollo de agentes de IA para empresas](https://www.why-and-if.solutions/soluciones/agentes-de-ia): En Y&iF diseñamos y desarrollamos agentes de inteligencia artificial a la medida para empresas en México y LATAM. Son asistentes que entienden lenguaje natural, consultan tus sistemas y ejecutan tareas de principio a fin, con reglas claras, supervisión humana y resultados medibles.
+- [Automatización robótica de procesos (RPA) con inteligencia artificial](https://www.why-and-if.solutions/soluciones/rpa): En Y&iF automatizamos con RPA e inteligencia artificial las tareas repetitivas que hoy consumen horas de tu equipo: captura de datos, conciliaciones, reportes y manejo de facturas. Los robots trabajan sobre tus sistemas actuales, sin reemplazarlos, y dejan registro de cada paso.
+- [Desarrollo de software a la medida](https://www.why-and-if.solutions/soluciones/desarrollo-de-software): En Y&iF desarrollamos software a la medida para empresas en México y LATAM: plataformas web, sistemas internos e integraciones, con inteligencia artificial donde aporta valor. Partimos del problema de negocio, validamos antes de construir y entregamos por etapas para que veas avances desde el inicio.
+
 ## Metodología
 
 - [Why Innovation Atomic Model (WIAM)](https://www.why-and-if.solutions/why-innovation-atomic-model): modelo propio de Y&iF que organiza la innovación en seis órbitas alrededor de un núcleo de objetivos estratégicos: Why (contexto y síntoma prioritario); If (deseabilidad - factibilidad - viabilidad); How (plan ejecutable y arquitectura mínima); Do (entrega en ciclos con calidad y seguridad); Learn (evidencia accionable para mejorar siempre); Innovation (lanzamiento, escalamiento y fuente de conocimientos).
