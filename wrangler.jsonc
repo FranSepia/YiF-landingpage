@@ -9,11 +9,16 @@
   "main": "worker/index.js",
   "compatibility_date": "2026-08-01",
 
-  // site/ es todo lo que se sirve al público. El enrutador de assets lo
-  // atiende antes que el Worker y ya resuelve las URLs limpias.
+  // site/ es todo lo que se sirve al público. El enrutador de assets resuelve
+  // las URLs limpias (/contacto → contacto.html).
+  //
+  // run_worker_first: las páginas pasan antes por worker/index.js (redirección
+  // a https://www, 301 en vez de 307 y la 404 con status real). /assets/ queda
+  // fuera para no gastar una invocación del Worker por cada imagen o CSS.
   "assets": {
     "directory": "./site",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    "run_worker_first": ["/*", "!/assets/*"]
   },
 
   // Deja los console.error del formulario visibles en el dashboard
