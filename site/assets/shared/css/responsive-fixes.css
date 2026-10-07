@@ -88,8 +88,17 @@ body > .page_wrap_seccion {
 }
 
 body > .page_wrap_seccion > .section-23,
-body > .page_wrap_seccion > .section-26 {
+body > .page_wrap_seccion > .section-26,
+body > .page_wrap_seccion > .yf-main > .section-23,
+body > .page_wrap_seccion > .yf-main > .section-26 {
   margin-top: auto;
+}
+
+/* <main> marca el contenido principal para lectores de pantalla y buscadores
+   sin crear una caja propia: con display:contents sus hijos siguen siendo
+   hijos de .page_wrap_seccion para el layout, igual que antes. */
+.yf-main {
+  display: contents;
 }
 
 /* El pie de Metodología nunca estuvo en el flujo: iba position:absolute con

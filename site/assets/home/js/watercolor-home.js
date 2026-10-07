@@ -410,7 +410,7 @@ var bloomFramebuffers = [];
 var sunrays;
 var sunraysTemp;
 
-var ditheringTexture = createTextureAsync('LDR_LLL1_0.png');
+var ditheringTexture = createTextureAsync('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4//8/AAX+Av4N70a4AAAAAElFTkSuQmCC');
 
 var blurProgram            = new Program(blurVertexShader, blurShader);
 var copyProgram            = new Program(baseVertexShader, copyShader);
