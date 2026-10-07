@@ -43,7 +43,7 @@ EMPRESA = {
     'nombre': 'Y&iF',
     'otros_nombres': ['Why and If', 'Y&F Group'],
     'eslogan': 'Purpose Driven Tech',
-    # La definición NO va aquí: se lee del párrafo .yf-home-intro de la home,
+    # La definición NO va aquí: se lee del párrafo .yf-home-intro de la home (oculto),
     # para que lo que dice la página y lo que dice el JSON-LD sea lo mismo.
     'sectores': 'sector público, corporativo y empresas, sector educativo, y tecnología y startups',
     'correo': 'contacto@why-and-if.solutions',
@@ -177,8 +177,9 @@ def data_en(attrs):
 # Contenido que se lee del HTML
 # --------------------------------------------------------------------------
 def definicion(lang='es'):
-    """La definición de Y&iF: el párrafo bajo el logo de la home."""
-    m = re.search(r'<p class="yf-home-intro"' + ATTRS + r'>(.*?)</p>', leer('index.html'), re.S)
+    """La definición de Y&iF: el párrafo .yf-home-intro de la home (oculto a la
+    vista con .yf-sr-only, pero en el HTML para buscadores y asistentes de IA)."""
+    m = re.search(r'<p class="[^"]*\byf-home-intro\b[^"]*"' + ATTRS + r'>(.*?)</p>', leer('index.html'), re.S)
     return texto(data_en(m.group(1)) if lang == 'en' else m.group(2))
 
 
