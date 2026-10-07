@@ -39,3 +39,15 @@
 
 /assets/shared/docs/*
   Cache-Control: public, max-age=86400
+
+# Seguridad básica para todo el sitio. Sin Content-Security-Policy a
+# propósito: Webflow deja scripts en línea en todas las páginas y una CSP
+# estricta los rompería.
+# HSTS sin includeSubDomains: sólo obliga HTTPS en este dominio, no en
+# subdominios que algún día pudieran no tener certificado.
+/*
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

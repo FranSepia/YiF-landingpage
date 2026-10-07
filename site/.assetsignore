@@ -1,0 +1,12 @@
+# Lo que está en site/ pero NO debe publicarse (formato .gitignore).
+# Wrangler sube todo site/ como archivos públicos salvo lo que se liste aquí.
+
+# Estado local de `wrangler dev`: incluye la base D1 local con leads de prueba.
+.wrangler/
+
+# Configuración de otros hosts (Netlify/Vercel); en Cloudflare no se usan y
+# no tienen por qué estar a la vista en /netlify.toml.
+netlify.toml
+vercel.json
+
+.assetsignore
