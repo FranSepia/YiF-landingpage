@@ -5,6 +5,9 @@ Regenera los archivos del sitio que dependen de las páginas:
 
   - la versión en texto de las 6 órbitas en la página de Metodología
   - el JSON-LD (datos estructurados) de cada página, dentro de su <head>
+  - la versión en inglés en site/en/ (a partir de los data-en de cada página),
+    con hreflang y el botón ES/EN enlazando una con otra
+  - ?v=<huella> en cada CSS/JS, para que un cambio se vea al publicarlo
   - site/llms.txt y site/llms-full.txt (resumen y contenido completo para IA)
   - site/sitemap.xml   con <lastmod> real de cada página
 
@@ -70,19 +73,33 @@ EMPRESA = {
     ],
 }
 
+TEMAS_EN = [
+    'Artificial intelligence', 'Process automation', 'Custom software development',
+    'Digital transformation', 'Innovation management', 'Technology project management',
+    'Digital product validation', 'Patents and intellectual property',
+    'Market intelligence', 'Executive innovation training',
+]
+
 # Páginas indexables: archivo dentro de site/ → URL pública, tipo de página
-# para schema.org, nombre corto (migas de pan) y datos del sitemap.
+# para schema.org, nombre corto (migas de pan) y datos del sitemap. Las que
+# llevan 'en' tienen versión en inglés generada en site/en/ (ver más abajo).
 PAGINAS = [
     {'archivo': 'index.html', 'url': '/', 'tipo': 'WebPage', 'miga': 'Inicio',
-     'freq': 'monthly', 'prioridad': '1.0'},
+     'freq': 'monthly', 'prioridad': '1.0',
+     'en': {'archivo': 'en/index.html', 'url': '/en/', 'miga': 'Home'}},
     {'archivo': 'soluciones.html', 'url': '/soluciones', 'tipo': 'CollectionPage',
-     'miga': 'Soluciones', 'freq': 'monthly', 'prioridad': '0.9'},
+     'miga': 'Soluciones', 'freq': 'monthly', 'prioridad': '0.9',
+     'en': {'archivo': 'en/solutions.html', 'url': '/en/solutions', 'miga': 'Solutions'}},
     {'archivo': 'why-innovation-atomic-model.html', 'url': '/why-innovation-atomic-model',
-     'tipo': 'WebPage', 'miga': 'Metodología WIAM', 'freq': 'monthly', 'prioridad': '0.9'},
+     'tipo': 'WebPage', 'miga': 'Metodología WIAM', 'freq': 'monthly', 'prioridad': '0.9',
+     'en': {'archivo': 'en/why-innovation-atomic-model.html', 'url': '/en/why-innovation-atomic-model',
+            'miga': 'WIAM methodology'}},
     {'archivo': 'ourwhy.html', 'url': '/ourwhy', 'tipo': 'AboutPage',
-     'miga': 'Lo que nos mueve', 'freq': 'monthly', 'prioridad': '0.8'},
+     'miga': 'Lo que nos mueve', 'freq': 'monthly', 'prioridad': '0.8',
+     'en': {'archivo': 'en/our-why.html', 'url': '/en/our-why', 'miga': 'What drives us'}},
     {'archivo': 'contacto.html', 'url': '/contacto', 'tipo': 'ContactPage',
-     'miga': 'Contacto', 'freq': 'monthly', 'prioridad': '0.8'},
+     'miga': 'Contacto', 'freq': 'monthly', 'prioridad': '0.8',
+     'en': {'archivo': 'en/contact.html', 'url': '/en/contact', 'miga': 'Contact'}},
     {'archivo': 'tarjetas/y-and-if.html', 'url': '/tarjetas/y-and-if', 'tipo': 'WebPage',
      'miga': 'Tarjeta digital', 'freq': 'yearly', 'prioridad': '0.3'},
     {'archivo': 'tarjetas/humberto-gonzalez-olmos.html', 'url': '/tarjetas/humberto-gonzalez-olmos',
@@ -119,7 +136,7 @@ def texto(fragmento):
 def meta(pagina_html):
     """(título, descripción) tal como están en el <head>."""
     titulo = re.search(r'<title[^>]*>(.*?)</title>', pagina_html, re.S)
-    desc = re.search(r'<meta content="([^"]*)" name="description"/>', pagina_html)
+    desc = re.search(r'<meta content="([^"]*)" name="description"', pagina_html)
     return (texto(titulo.group(1)) if titulo else '',
             html.unescape(desc.group(1)) if desc else '')
 
@@ -248,8 +265,15 @@ def servicios():
 # --------------------------------------------------------------------------
 # JSON-LD
 # --------------------------------------------------------------------------
-def organizacion():
+def zona(lang):
+    if lang == 'en':
+        return [{'@type': 'Country', 'name': 'Mexico'}, {'@type': 'Place', 'name': 'Latin America'}]
+    return [{'@type': 'Country', 'name': 'México'}, {'@type': 'Place', 'name': 'Latinoamérica'}]
+
+
+def organizacion(lang='es'):
     e = EMPRESA
+    en = lang == 'en'
     org = {
         '@type': ['Organization', 'ProfessionalService'],
         '@id': ORG_ID,
@@ -258,15 +282,14 @@ def organizacion():
         'url': DOMINIO + '/',
         'logo': {'@type': 'ImageObject', 'url': DOMINIO + e['logo'], 'width': 256, 'height': 256},
         'image': DOMINIO + e['imagen'],
-        'description': definicion(),
+        'description': definicion(lang),
         'slogan': e['eslogan'],
         'email': e['correo'],
         'telephone': e['telefono'],
         'address': e['direccion'],
         'hasMap': e['mapa'],
-        'areaServed': [{'@type': 'Country', 'name': 'México'},
-                       {'@type': 'Place', 'name': 'Latinoamérica'}],
-        'knowsAbout': e['temas'],
+        'areaServed': zona(lang),
+        'knowsAbout': TEMAS_EN if en else e['temas'],
         'knowsLanguage': ['es-MX', 'en'],
         'contactPoint': [
             {'@type': 'ContactPoint', 'contactType': 'sales', 'email': e['correo'],
@@ -275,8 +298,9 @@ def organizacion():
             {'@type': 'ContactPoint', 'contactType': 'WhatsApp', 'telephone': e['whatsapp'],
              'availableLanguage': ['Spanish', 'English']},
         ],
-        'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': 'Soluciones de Y&iF',
-                            'url': DOMINIO + '/soluciones'},
+        'hasOfferCatalog': {'@type': 'OfferCatalog',
+                            'name': 'Y&iF solutions' if en else 'Soluciones de Y&iF',
+                            'url': DOMINIO + ('/en/solutions' if en else '/soluciones')},
     }
     if e['perfiles']:
         org['sameAs'] = e['perfiles']
@@ -285,41 +309,46 @@ def organizacion():
 
 def sitio_web():
     return {'@type': 'WebSite', '@id': SITIO_ID, 'url': DOMINIO + '/', 'name': EMPRESA['nombre'],
-            'alternateName': 'Why and If', 'inLanguage': 'es-MX',
+            'alternateName': 'Why and If', 'inLanguage': ['es-MX', 'en'],
             'publisher': {'@id': ORG_ID}}
 
 
-def migas(url, nombre):
+def migas(url, nombre, lang='es'):
+    inicio = ('Home', DOMINIO + '/en/') if lang == 'en' else ('Inicio', DOMINIO + '/')
     return {'@type': 'BreadcrumbList', '@id': DOMINIO + url + '#migas', 'itemListElement': [
-        {'@type': 'ListItem', 'position': 1, 'name': 'Inicio', 'item': DOMINIO + '/'},
+        {'@type': 'ListItem', 'position': 1, 'name': inicio[0], 'item': inicio[1]},
         {'@type': 'ListItem', 'position': 2, 'name': nombre, 'item': DOMINIO + url},
     ]}
 
 
-def grafo(p):
-    s = leer(p['archivo'])
+def grafo(p, s=None, lang='es'):
+    """JSON-LD de una página. `s` es su HTML (para la versión en inglés, que
+    todavía no está escrita en disco cuando se arma)."""
+    s = s if s is not None else leer(p['archivo'])
+    en = lang == 'en'
     titulo, descripcion = meta(s)
-    url = DOMINIO + p['url']
+    ruta = p['en']['url'] if en else p['url']
+    url = DOMINIO + ruta
     pagina = {
         '@type': p['tipo'], '@id': url + '#pagina', 'url': url, 'name': titulo,
-        'description': descripcion, 'inLanguage': 'es-MX',
+        'description': descripcion, 'inLanguage': 'en' if en else 'es-MX',
         'isPartOf': {'@id': SITIO_ID}, 'about': {'@id': ORG_ID},
     }
-    nodos = [organizacion(), sitio_web(), pagina]
+    nodos = [organizacion(lang), sitio_web(), pagina]
     if p['url'] != '/':
         pagina['breadcrumb'] = {'@id': url + '#migas'}
-        nodos.append(migas(p['url'], p['miga']))
+        nodos.append(migas(ruta, p['en']['miga'] if en else p['miga'], lang))
 
     if p['archivo'] == 'soluciones.html':
         nodos.append({
-            '@type': 'ItemList', '@id': url + '#servicios', 'name': 'Soluciones de Y&iF',
+            '@type': 'ItemList', '@id': url + '#servicios',
+            'name': 'Y&iF solutions' if en else 'Soluciones de Y&iF',
             'itemListElement': [
                 {'@type': 'ListItem', 'position': i, 'item': {
-                    '@type': 'Service', 'name': sv['nombre'], 'serviceType': sv['subtitulo'],
-                    'description': sv['texto'], 'provider': {'@id': ORG_ID},
-                    'areaServed': [{'@type': 'Country', 'name': 'México'},
-                                   {'@type': 'Place', 'name': 'Latinoamérica'}],
-                    'url': url}}
+                    '@type': 'Service', 'name': sv['nombre'],
+                    'serviceType': sv['subtitulo_en'] if en else sv['subtitulo'],
+                    'description': sv['texto_en'] if en else sv['texto'],
+                    'provider': {'@id': ORG_ID}, 'areaServed': zona(lang), 'url': url}}
                 for i, sv in enumerate(servicios(), 1)],
         })
         pagina['mainEntity'] = {'@id': url + '#servicios'}
@@ -343,16 +372,17 @@ def bloque_jsonld(datos):
     return '<script type="application/ld+json">%s</script>' % cuerpo.replace('</', '<\\/')
 
 
+def con_jsonld(s, datos):
+    nuevo = bloque_jsonld(datos)
+    patron = re.compile(r'<script type="application/ld\+json">.*?</script>', re.S)
+    if patron.search(s):
+        return patron.sub(lambda m: nuevo, s, count=1)
+    return s.replace('</head>', nuevo + '</head>', 1)
+
+
 def aplicar_jsonld():
     for p in PAGINAS:
-        s = leer(p['archivo'])
-        nuevo = bloque_jsonld(grafo(p))
-        patron = re.compile(r'<script type="application/ld\+json">.*?</script>', re.S)
-        if patron.search(s):
-            s = patron.sub(lambda m: nuevo, s, count=1)
-        else:
-            s = s.replace('</head>', nuevo + '</head>', 1)
-        escribir(p['archivo'], s)
+        escribir(p['archivo'], con_jsonld(leer(p['archivo']), grafo(p)))
     print('JSON-LD: %d páginas' % len(PAGINAS))
 
 
@@ -405,6 +435,147 @@ def aplicar_texto_wiam():
 
 
 # --------------------------------------------------------------------------
+# Versión en inglés (site/en/) y enlaces entre idiomas
+# --------------------------------------------------------------------------
+# Cada página en español ya trae su traducción: data-en en los elementos (su
+# contenido completo en inglés) y data-en-<atributo> en los atributos
+# (data-en-content, data-en-alt, data-en-aria-label, data-en-value…). Antes un
+# script cambiaba el texto en el navegador, así que Google sólo veía español;
+# ahora site/en/ son páginas reales, con su URL, que los buscadores indexan.
+# Se edita sólo la página en español y aquí se arma la inglesa.
+ETIQUETA = re.compile(r'<(?P<cierre>/?)(?P<tag>[a-zA-Z][\w-]*)(?P<attrs>(?:\s+[\w:-]+(?:="[^"]*")?)*)\s*(?P<auto>/?)>')
+MARCA_IDIOMAS = ('<!-- yf:idiomas -->', '<!-- /yf:idiomas -->')
+
+
+def cierre_de(s, desde, tag):
+    """(inicio, fin) del </tag> que cierra el elemento abierto justo antes de `desde`."""
+    nivel = 1
+    for m in ETIQUETA.finditer(s, desde):
+        if m.group('tag').lower() != tag:
+            continue
+        if m.group('cierre'):
+            nivel -= 1
+        elif not m.group('auto'):
+            nivel += 1
+        if nivel == 0:
+            return m.start(), m.end()
+    raise ValueError('<%s> sin cierre' % tag)
+
+
+def traducir(s):
+    """Aplica data-en / data-en-<atributo> y los quita del HTML."""
+    salida, pos = [], 0
+    while True:
+        m = ETIQUETA.search(s, pos)
+        if not m:
+            break
+        tag = m.group('tag').lower()
+        if not m.group('cierre') and tag in ('script', 'style'):
+            fin = s.index('</%s>' % tag, m.end()) + len(tag) + 3
+            salida.append(s[pos:fin])
+            pos = fin
+            continue
+        if m.group('cierre') or 'data-en' not in m.group('attrs'):
+            salida.append(s[pos:m.end()])
+            pos = m.end()
+            continue
+        attrs = re.findall(r'\s+([\w:-]+)(?:="([^"]*)")?', m.group('attrs'))
+        valores = dict(attrs)
+        contenido = valores.get('data-en')
+        nuevos = []
+        for nombre, valor in attrs:
+            if nombre == 'data-en' or nombre.startswith('data-en-'):
+                continue
+            if 'data-en-' + nombre in valores:
+                valor = valores['data-en-' + nombre]
+            nuevos.append((nombre, valor))
+        # data-en-<x> sin atributo <x> en el original: se agrega.
+        for nombre, valor in attrs:
+            if nombre.startswith('data-en-') and nombre[8:] not in valores:
+                nuevos.append((nombre[8:], valor))
+        abre = '<%s%s%s>' % (m.group('tag'), ''.join(' %s="%s"' % (n, v) for n, v in nuevos),
+                             '/' if m.group('auto') else '')
+        if contenido is None:
+            salida.append(s[pos:m.start()] + abre)
+            pos = m.end()
+            continue
+        # El contenido se usa como lo haría innerHTML: se des-escapa el valor
+        # del atributo y se vuelven a escapar los "&" sueltos (Y&iF).
+        interior = re.sub(r'&(?![#\w]+;)', '&amp;', html.unescape(contenido))
+        ini, fin = cierre_de(s, m.end(), tag)
+        salida.append(s[pos:m.start()] + abre + interior + s[ini:fin])
+        pos = fin
+    salida.append(s[pos:])
+    return ''.join(salida)
+
+
+def boton_idioma(p, lang):
+    """El botón ES/EN es un enlace a la misma página en el otro idioma."""
+    if lang == 'es':
+        return ('<a class="lang-toggle-btn" href="%s" hreflang="en" lang="en" title="English version">'
+                'EN<span class="yf-sr-only"> — English version</span></a>' % p['en']['url'])
+    return ('<a class="lang-toggle-btn" href="%s" hreflang="es-MX" lang="es-MX" title="Versión en español">'
+            'ES<span class="yf-sr-only"> — versión en español</span></a>' % p['url'])
+
+
+def con_idiomas(s, p, lang):
+    """hreflang + og:locale:alternate en el <head> y el botón de idioma."""
+    es, en = DOMINIO + p['url'], DOMINIO + p['en']['url']
+    bloque = (MARCA_IDIOMAS[0] +
+              '<link rel="alternate" hreflang="es-MX" href="%s"/>'
+              '<link rel="alternate" hreflang="en" href="%s"/>'
+              '<link rel="alternate" hreflang="x-default" href="%s"/>'
+              '<meta property="og:locale:alternate" content="%s"/>' % (es, en, es, 'en_US' if lang == 'es' else 'es_MX') +
+              MARCA_IDIOMAS[1])
+    if MARCA_IDIOMAS[0] in s:
+        s = re.sub(re.escape(MARCA_IDIOMAS[0]) + '.*?' + re.escape(MARCA_IDIOMAS[1]),
+                   lambda m: bloque, s, count=1, flags=re.S)
+    else:
+        s = re.sub(r'(<link rel="canonical" href="[^"]*"/>)', lambda m: m.group(1) + bloque, s, count=1)
+    boton = boton_idioma(p, lang)
+    s, k = re.subn(r'<button type="button" class="lang-toggle-btn"[^>]*>EN</button>|'
+                   r'<a class="lang-toggle-btn"[^>]*>.*?</a>', lambda m: boton, s, count=1, flags=re.S)
+    assert k == 1, 'sin botón de idioma en ' + p['archivo']
+    return s
+
+
+def a_ingles(p):
+    s = traducir(leer(p['archivo']))
+    es, en = DOMINIO + p['url'], DOMINIO + p['en']['url']
+    s = s.replace('<html lang="es-MX"', '<html lang="en"', 1)
+    s = s.replace('<link rel="canonical" href="%s"/>' % es, '<link rel="canonical" href="%s"/>' % en)
+    s = s.replace('<meta property="og:url" content="%s"/>' % es, '<meta property="og:url" content="%s"/>' % en)
+    s = s.replace('<meta property="og:locale" content="es_MX"/>', '<meta property="og:locale" content="en_US"/>')
+    titulo, descripcion = meta(s)
+    t, d = html.escape(titulo, quote=True), html.escape(descripcion, quote=True)
+    s = re.sub(r'<meta content="[^"]*" (property="og:title"|name="twitter:title")/>',
+               lambda m: '<meta content="%s" %s/>' % (t, m.group(1)), s)
+    s = re.sub(r'<meta content="[^"]*" (property="og:description"|name="twitter:description")/>',
+               lambda m: '<meta content="%s" %s/>' % (d, m.group(1)), s)
+    # La página vive un nivel abajo (/en/...): las rutas relativas suben uno.
+    s = re.sub(r'(?<=[="\'(,;\s])assets/', '../assets/', s)
+    # Los enlaces internos llevan a la versión en inglés.
+    for q in PAGINAS:
+        if 'en' in q:
+            s = s.replace('href="%s"' % q['url'], 'href="%s"' % q['en']['url'])
+    s = con_idiomas(s, p, 'en')
+    if p['archivo'] == 'why-innovation-atomic-model.html':
+        s = con_texto_wiam(s, 'en')
+    return con_jsonld(s, grafo(p, s, 'en'))
+
+
+def generar_ingles():
+    n = 0
+    for p in PAGINAS:
+        if 'en' not in p:
+            continue
+        escribir(p['archivo'], con_idiomas(leer(p['archivo']), p, 'es'))
+        escribir(p['en']['archivo'], a_ingles(p))
+        n += 1
+    print('Inglés: %d páginas en site/en/' % n)
+
+
+# --------------------------------------------------------------------------
 # llms.txt y llms-full.txt (https://llmstxt.org)
 # --------------------------------------------------------------------------
 def generar_llms():
@@ -441,6 +612,7 @@ def generar_llms():
           '- [Soluciones](%s): las %d soluciones, con su descripción.' % (url('/soluciones'), len(sv)),
           '- [Metodología WIAM](%s): las seis órbitas, con preguntas clave y herramientas.' % url('/why-innovation-atomic-model'),
           '- [Contacto](%s): formulario para iniciar una conversación.' % url('/contacto'),
+          '- [English version](%s): the same site in English (/en/solutions, /en/contact…).' % url('/en/'),
           '', '## Contacto', '',
           '- Correo: ' + e['correo'],
           '- Teléfono: ' + e['telefono'].replace('-', ' '),
@@ -489,26 +661,80 @@ def generar_llms():
 
 
 # --------------------------------------------------------------------------
+# Versión en las URLs de CSS y JS
+# --------------------------------------------------------------------------
+# site/_headers deja CSS y JS una hora en la caché del navegador. Para que un
+# cambio se vea en cuanto se publica, cada página los pide con ?v=<huella del
+# contenido>: si el archivo cambia, cambia la URL y el navegador lo baja otra vez.
+REF_ASSET = re.compile(r'((?:src|href)=")((?:\.\./|/)?assets/[^"?]+\.(?:css|js|txt))(?:\?v=[0-9a-f]+)?(")')
+
+
+def versionar_assets():
+    import glob
+    import hashlib
+    huellas = {}
+
+    def huella(ruta):
+        if ruta not in huellas:
+            with open(ruta, 'rb') as f:
+                # Sin CR: así la huella es la misma con finales de línea de Windows o de git.
+                huellas[ruta] = hashlib.sha1(f.read().replace(b'\r\n', b'\n')).hexdigest()[:8]
+        return huellas[ruta]
+
+    n = 0
+    for pagina in glob.glob(os.path.join(SITE, '**', '*.html'), recursive=True):
+        if '.wrangler' in pagina:
+            continue
+        with open(pagina, encoding='utf-8') as f:
+            s = f.read()
+
+        def poner(m):
+            ref = m.group(2)
+            base = SITE if ref.startswith('/') else os.path.dirname(pagina)
+            ruta = os.path.normpath(os.path.join(base, ref.lstrip('/')))
+            if not os.path.isfile(ruta):
+                return m.group(0)
+            return '%s%s?v=%s%s' % (m.group(1), ref, huella(ruta), m.group(3))
+
+        nuevo = REF_ASSET.sub(poner, s)
+        if nuevo != s:
+            with open(pagina, 'w', encoding='utf-8', newline='\n') as f:
+                f.write(nuevo)
+            n += 1
+    print('CSS/JS versionados en %d páginas' % n)
+
+
+# --------------------------------------------------------------------------
 # sitemap.xml
 # --------------------------------------------------------------------------
 def generar_sitemap():
     lineas = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<!-- Generado por _work/build.py: no lo edites a mano. -->',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+        ' xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     ]
+    n = 0
     for p in PAGINAS:
-        lineas += [
-            '  <url>',
-            '    <loc>%s</loc>' % escape(DOMINIO + p['url']),
-            '    <lastmod>%s</lastmod>' % ultima_modificacion(p['archivo']),
-            '    <changefreq>%s</changefreq>' % p['freq'],
-            '    <priority>%s</priority>' % p['prioridad'],
-            '  </url>',
-        ]
+        versiones = [(p['url'], p['archivo'])]
+        if 'en' in p:
+            versiones.append((p['en']['url'], p['en']['archivo']))
+        for url, archivo in versiones:
+            lineas += ['  <url>', '    <loc>%s</loc>' % escape(DOMINIO + url)]
+            if 'en' in p:
+                # Cada versión declara a las dos (y a la española como x-default).
+                lineas += ['    <xhtml:link rel="alternate" hreflang="%s" href="%s"/>' % (h, escape(DOMINIO + u))
+                           for h, u in (('es-MX', p['url']), ('en', p['en']['url']), ('x-default', p['url']))]
+            lineas += [
+                '    <lastmod>%s</lastmod>' % ultima_modificacion(archivo),
+                '    <changefreq>%s</changefreq>' % p['freq'],
+                '    <priority>%s</priority>' % p['prioridad'],
+                '  </url>',
+            ]
+            n += 1
     lineas.append('</urlset>')
     escribir('sitemap.xml', '\n'.join(lineas) + '\n')
-    print('sitemap.xml: %d URLs' % len(PAGINAS))
+    print('sitemap.xml: %d URLs' % n)
 
 
 if __name__ == '__main__':
@@ -516,7 +742,11 @@ if __name__ == '__main__':
         sys.stdout.reconfigure(encoding='utf-8')  # acentos en la consola de Windows
     except (AttributeError, ValueError):
         pass
+    # El orden importa: la versión en inglés se arma a partir de las páginas
+    # en español ya actualizadas, y el sitemap necesita las dos.
     aplicar_texto_wiam()
     aplicar_jsonld()
+    generar_ingles()
+    versionar_assets()
     generar_llms()
     generar_sitemap()

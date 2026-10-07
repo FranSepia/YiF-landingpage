@@ -14,6 +14,10 @@
 
   var BREAKPOINT = 991;
 
+  var EN = (document.documentElement.lang || '').slice(0, 2) === 'en';
+  var ABRIR = EN ? 'Open menu' : 'Abrir menú';
+  var CERRAR = EN ? 'Close menu' : 'Cerrar menú';
+
   function init() {
     var wrapper = document.querySelector('.navbar-wrapper.w-nav');
     var container = wrapper && wrapper.querySelector('.navbar-container');
@@ -26,7 +30,7 @@
     var toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'yf-nav-toggle';
-    toggle.setAttribute('aria-label', 'Abrir menú');
+    toggle.setAttribute('aria-label', ABRIR);
     toggle.setAttribute('aria-expanded', 'false');
     toggle.appendChild(document.createElement('span'));
 
@@ -37,7 +41,7 @@
     function setOpen(open) {
       wrapper.classList.toggle('yf-nav-open', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      toggle.setAttribute('aria-label', open ? CERRAR : ABRIR);
     }
 
     toggle.addEventListener('click', function (e) {

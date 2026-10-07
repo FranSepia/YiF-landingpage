@@ -26,6 +26,7 @@
   line-height: 1;
   text-transform: uppercase;
   cursor: pointer;
+  text-decoration: none;
   opacity: .55;
   transition: opacity .25s ease, transform .25s ease, border-color .25s ease;
 }

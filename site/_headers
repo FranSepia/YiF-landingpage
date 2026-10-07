@@ -25,9 +25,9 @@
 /assets/tarjetas/:name/video/*
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 
-# CSS y JS se editan seguido y no llevan versión en el nombre: una hora basta
-# para no repetir descargas dentro de la misma visita sin servir código viejo
-# mucho tiempo después de un deploy.
+# CSS y JS: las páginas los piden con ?v=<huella> (lo pone _work/build.py),
+# así que un cambio publicado cambia la URL y se baja de nuevo. La hora de
+# caché es la red de seguridad por si alguien olvida correr el build.
 /assets/shared/css/*
   Cache-Control: public, max-age=3600
 

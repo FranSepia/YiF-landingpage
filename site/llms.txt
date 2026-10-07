@@ -37,6 +37,7 @@ Datos clave:
 - [Soluciones](https://www.why-and-if.solutions/soluciones): las 11 soluciones, con su descripción.
 - [Metodología WIAM](https://www.why-and-if.solutions/why-innovation-atomic-model): las seis órbitas, con preguntas clave y herramientas.
 - [Contacto](https://www.why-and-if.solutions/contacto): formulario para iniciar una conversación.
+- [English version](https://www.why-and-if.solutions/en/): the same site in English (/en/solutions, /en/contact…).
 
 ## Contacto
 
