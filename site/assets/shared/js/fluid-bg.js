@@ -1215,17 +1215,23 @@ SOFTWARE.
   }
   watchContextLoss(canvas);
 
-  // Arranque tras DOM listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
+  // Arranque cuando la pagina ya cargo y el navegador quedo libre. Compilar
+  // los shaders bloquea el hilo principal varios cientos de ms; hacerlo en
+  // DOMContentLoaded retrasaba el primer pintado y la respuesta a los clics
+  // (TBT de 860 ms en Metodologia). El lienzo es negro mientras tanto, asi que
+  // solo se nota que el fluido aparece un instante despues. Si el contexto
+  // WebGL se niega la primera vez, boot() ya reintenta por su cuenta.
+  function arrancarCuandoLibre() {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(boot, { timeout: 2000 });
+    } else {
+      setTimeout(boot, 200);
+    }
   }
-
-  // Red de seguridad: si tras cargar la pagina el lienzo sigue sin arrancar
-  // (contexto negado en el primer intento), se vuelve a intentar.
-  window.addEventListener('load', function () {
-    if (!running) { bootAttempts = 0; boot(); }
-  });
+  if (document.readyState === 'complete') {
+    arrancarCuandoLibre();
+  } else {
+    window.addEventListener('load', arrancarCuandoLibre);
+  }
 
 })();

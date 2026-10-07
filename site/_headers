@@ -1,0 +1,41 @@
+# Cabeceras HTTP del sitio (Cloudflare Workers static assets).
+# https://developers.cloudflare.com/workers/static-assets/headers/
+#
+# Caché: antes TODO salía con max-age=0, así que cada visita volvía a pedir
+# fuentes, imágenes y ~17 MB de video. Las reglas no se pisan entre sí: si dos
+# reglas ponen el mismo header, Cloudflare junta los valores con coma y el
+# Cache-Control queda inválido.
+#
+# OJO al reemplazar un archivo: imágenes y videos se guardan 30 días en el
+# navegador. Si cambias una imagen, súbela con OTRO nombre (como hace Webflow
+# con su prefijo de ID) para que se vea de inmediato.
+
+/assets/shared/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/:page/img/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/assets/:page/video/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/assets/tarjetas/:name/img/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+/assets/tarjetas/:name/video/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
+# CSS y JS se editan seguido y no llevan versión en el nombre: una hora basta
+# para no repetir descargas dentro de la misma visita sin servir código viejo
+# mucho tiempo después de un deploy.
+/assets/shared/css/*
+  Cache-Control: public, max-age=3600
+
+/assets/shared/js/*
+  Cache-Control: public, max-age=3600
+
+/assets/:page/js/*
+  Cache-Control: public, max-age=3600
+
+/assets/shared/docs/*
+  Cache-Control: public, max-age=86400
