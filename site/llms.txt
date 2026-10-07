@@ -1,46 +1,41 @@
 # Y&iF (Why and If)
 
-> Consultoría de innovación tecnológica con propósito, con sede en Ciudad de
-> México. Integra estrategia, ingeniería y desarrollo de software a la medida
-> para acompañar a organizaciones en procesos de transformación digital, desde
-> la definición del problema hasta la puesta en producción.
+> Y&iF (Why and If) es una consultoría de innovación tecnológica e inteligencia artificial con sede en la Ciudad de México que ayuda a empresas, gobierno y sector educativo de México y LATAM a diseñar, validar y construir soluciones digitales —automatización con IA, software a la medida y transformación digital— con su metodología propia, WIAM.
 
-Y&iF opera bajo el lema "Purpose Driven Tech": tecnología con propósito y
-resultados medibles. Trabaja con sector público, corporativo y empresas,
-sector educativo, y tecnología y startups.
+Y&iF opera bajo el lema "Purpose Driven Tech": tecnología con propósito y resultados medibles. Trabaja con sector público, corporativo y empresas, sector educativo, y tecnología y startups.
 
-## Metodología
+Datos clave:
 
-El **Why Innovation Atomic Model (WIAM)** es el modelo propio de Y&iF. Organiza
-el trabajo en seis órbitas alrededor de un núcleo de objetivos estratégicos:
-
-- **Why** — contexto y síntoma prioritario: por qué actuar ahora, para quién y con qué límites.
-- **If** — deseabilidad, factibilidad y viabilidad: validar antes de construir.
-- **How** — plan ejecutable y arquitectura mínima: roadmap, dueños, riesgos y criterios de aceptación.
-- **Do** — entrega en ciclos con calidad y seguridad.
-- **Learn** — evidencia accionable para mejorar de forma continua.
-- **Innovation** — lanzamiento, escalamiento y captura de conocimiento.
+- Sede: Ciudad de México (Miguel Hidalgo), México
+- Mercado: México y Latinoamérica
+- Idiomas: español e inglés
+- Soluciones: 11 (lista abajo)
+- Metodología propia: Why Innovation Atomic Model (WIAM), de seis órbitas
 
 ## Soluciones
 
-- **Innovate Blueprint** — estrategia y cultura de innovación.
-- **TechFlow Management** — dirección de proyectos tecnológicos.
-- **Zero-to-Launch** — creación y validación de productos.
-- **CodeCraft** — desarrollo de software a la medida.
-- **Digital Edge** — transformación digital estratégica.
-- **Innovation Academy** — formación ejecutiva en innovación.
-- **SmartTech Integration** — integración de tecnologías avanzadas.
-- **ProcessFlow X** — optimización y automatización de procesos.
-- **PatentForge** — desarrollo y gestión de patentes desde cero.
-- **MarketLens** — inteligencia de mercado y tendencias tecnológicas.
-- **StorySpark** — narrativa y comunicación de producto.
+- [ProcessFlow X](https://www.why-and-if.solutions/soluciones): Optimización y Automatización de Procesos. Simplificamos y automatizamos tus flujos de trabajo, Para que logres más en menos tiempo y con menos errores.
+- [Digital Edge](https://www.why-and-if.solutions/soluciones): Transformación Digital Estratégica. Rediseñamos procesos y aplicamos tecnología para modernizar tu empresa. Para que ganes eficiencia, redezcas costos y escales con solidez.
+- [StorySpark](https://www.why-and-if.solutions/soluciones): Presentaciones Ejecutivas de Alto Impacto. Transformamos ideas complejas en presentaciones ejecutivas poderosas que conectan con tu audiencia. Conjugamos narrativa estratégica y diseño impecable para que cada mensaje inspire, convenza y genere impacto real.
+- [SmartTech Integration](https://www.why-and-if.solutions/soluciones): Integración de Tecnologías Avanzadas. Impulsamos la evolución de tu empresa mediante la aplicación de IA, IoT y soluciones tecnológicas de vanguardia. Nuestro enfoque convierte la innovación en una ventaja competitiva, optimizando tus operaciones y abriendo nuevas oportunidades de crecimiento.
+- [Innovation Academy](https://www.why-and-if.solutions/soluciones): Formación Ejecutiva en Innovación. Entrenamos a tus equipos en pensamiento creativo y habilidades tecnológicas. Para que la innovación sea parte del ADN de tu organización.
+- [Innovate Blueprint](https://www.why-and-if.solutions/soluciones): Estrategia y Cultura de Innovación. Diseñamos estrategias integrales que transforman a tu empresa a un verdadero hub creativo y competitivo. Con Innovate Blueprint, la innovación deja de ser solo un concepto y se convierte en resultados tangibles que impulsan tu crecimiento.
+- [MarketLens](https://www.why-and-if.solutions/soluciones): Inteligencia de Mercado y Tendencias Tecnológicas. Analizamos tu sector y detectamos oportunidades estratégicas. Para que tomes decisiones respaldadas por datos y visión de futuro.
+- [CodeCraft](https://www.why-and-if.solutions/soluciones): Desarrollo de Software a la Medida. Creamos software inteligente y adaptable, diseñado específicamente para potenciar tu modelo de negocio. Nuestras soluciones convierten la tecnología en un motor de eficiencia, innovación y crecimiento. Asegurando que trabaje a tu favor y te mantenga siempre un paso adelante.
+- [Techflow Management](https://www.why-and-if.solutions/soluciones): Dirección de Proyectos Tecnológicos. Gestionamos tus proyectos de forma ágil, asegurando calidad y cumplimiento. Para que tus ideas lleguen al mercado sin retrasos ni sobrecostos.
+- [Patent Forge](https://www.why-and-if.solutions/soluciones): Desarrollo y Gestión de Patentes desde Cero. Creamos, documentamos y registramos tus patentes desde la idea inicial. Para que tu innovación esté protegida y sea 100% tuya.
+- [Zero to Launch](https://www.why-and-if.solutions/soluciones): Creación y Validación de Productos. Llevamos tu idea desde un boceto hasta un producto probado y listo para lanzar. Para que inviertas solo en lo que realmente tiene potencial.
+
+## Metodología
+
+- [Why Innovation Atomic Model (WIAM)](https://www.why-and-if.solutions/why-innovation-atomic-model): modelo propio de Y&iF que organiza la innovación en seis órbitas alrededor de un núcleo de objetivos estratégicos: Why (contexto y síntoma prioritario); If (deseabilidad - factibilidad - viabilidad); How (plan ejecutable y arquitectura mínima); Do (entrega en ciclos con calidad y seguridad); Learn (evidencia accionable para mejorar siempre); Innovation (lanzamiento, escalamiento y fuente de conocimientos).
 
 ## Páginas
 
-- [Inicio](https://www.why-and-if.solutions/): presentación de la consultoría.
+- [Inicio](https://www.why-and-if.solutions/): quiénes somos, en una frase.
 - [Lo que nos mueve](https://www.why-and-if.solutions/ourwhy): misión, visión y propósito.
-- [Soluciones](https://www.why-and-if.solutions/soluciones): las once soluciones, con su descripción.
-- [Metodología Y&iF](https://www.why-and-if.solutions/why-innovation-atomic-model): el modelo WIAM en detalle, con preguntas clave y herramientas por órbita.
+- [Soluciones](https://www.why-and-if.solutions/soluciones): las 11 soluciones, con su descripción.
+- [Metodología WIAM](https://www.why-and-if.solutions/why-innovation-atomic-model): las seis órbitas, con preguntas clave y herramientas.
 - [Contacto](https://www.why-and-if.solutions/contacto): formulario para iniciar una conversación.
 
 ## Contacto
@@ -49,4 +44,8 @@ el trabajo en seis órbitas alrededor de un núcleo de objetivos estratégicos:
 - Teléfono: +52 55 4748 0723
 - WhatsApp: +52 55 7009 9790
 - Dirección: Monte Elbruz 124, Piso 2, Int. 212-B, Lomas de Chapultepec III Secc., Miguel Hidalgo, C.P. 11000, Ciudad de México, México
-- Idiomas: español e inglés (el sitio tiene un selector ES/EN).
+
+## Optional
+
+- [Contenido completo en Markdown](https://www.why-and-if.solutions/llms-full.txt): todo el texto del sitio en un solo archivo.
+- [Tarjeta digital de Y&iF](https://www.why-and-if.solutions/tarjetas/y-and-if): datos de contacto en formato tarjeta.
