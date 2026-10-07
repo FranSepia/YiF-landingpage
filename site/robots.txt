@@ -1,16 +1,44 @@
 # Y&iF — https://www.why-and-if.solutions
 # Todo el sitio es público: buscadores y asistentes de IA pueden rastrearlo.
+#
+# Ojo: un bot que tiene su propio grupo IGNORA el grupo "*". Por eso las
+# exclusiones se repiten en los dos grupos; si agregas una, agrégala en ambos.
+#
+# Que aquí estén permitidos no basta: Cloudflare puede bloquearlos antes de
+# que lleguen (Security → Bots / AI Crawl Control). Ver README.
 
-User-agent: *
+# Buscadores y asistentes de IA, permitidos de forma explícita.
+# User-agents según la documentación oficial de cada empresa:
+#   OpenAI      GPTBot (entrenamiento), OAI-SearchBot (búsqueda en ChatGPT),
+#               ChatGPT-User (visitas pedidas por un usuario)
+#   Anthropic   ClaudeBot, Claude-SearchBot, Claude-User
+#   Perplexity  PerplexityBot, Perplexity-User
+#   Google      Googlebot; Google-Extended es sólo un token de permiso para
+#               Gemini, no rastrea por su cuenta
+#   Apple       Applebot; Applebot-Extended, igual que el de Google
+#   Microsoft   Bingbot (alimenta también a Copilot)
+User-agent: Googlebot
+User-agent: Google-Extended
+User-agent: Bingbot
+User-agent: Applebot
+User-agent: Applebot-Extended
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
 Allow: /
-
-# Estas dos no aportan nada: una está vacía y la otra es una copia de
-# /soluciones. Llevan noindex en su HTML; aquí se evita además el rastreo.
 Disallow: /aliados-expertos
 Disallow: /soluciones-copy
 
-# Los assets deben poder rastrearse o Google no puede renderizar la página
-# y la evalúa como si estuviera rota.
-Allow: /assets/
+# Todos los demás.
+User-agent: *
+Allow: /
+# Una está vacía y la otra es una copia de /soluciones; además llevan noindex.
+Disallow: /aliados-expertos
+Disallow: /soluciones-copy
 
 Sitemap: https://www.why-and-if.solutions/sitemap.xml

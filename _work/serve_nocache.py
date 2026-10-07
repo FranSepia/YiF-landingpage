@@ -2,6 +2,13 @@ import http.server, socketserver, os, sys
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'site'))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8124
 class H(http.server.SimpleHTTPRequestHandler):
+    def translate_path(self, path):
+        # Los enlaces del sitio usan URLs limpias (/contacto, /en/solutions),
+        # igual que en Cloudflare: si no existe el archivo, se prueba con .html.
+        real = super().translate_path(path)
+        if not os.path.exists(real) and os.path.exists(real + '.html'):
+            return real + '.html'
+        return real
     def end_headers(self):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         self.send_header('Pragma', 'no-cache')
