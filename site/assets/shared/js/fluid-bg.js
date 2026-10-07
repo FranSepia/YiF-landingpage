@@ -74,16 +74,22 @@ SOFTWARE.
     return canvas;
   }
 
-  // Asegura que exista antes de seguir
+  // Asegura que exista antes de seguir. Se le da el tamaño de la pantalla de
+  // inmediato: un <canvas> recién creado mide 300×150, y si el cursor se movía
+  // antes de que arrancara la animación, su posición se calculaba contra ese
+  // tamaño. Al arrancar, el primer movimiento parecía un salto gigante, la
+  // simulación se desbordaba y el fondo dejaba de pintar hasta recargar.
   var canvas = ensureCanvas();
+  resizeCanvas();
 
-  // Re-crea si alguien lo quita/cambia
+  // Re-crea si alguien lo quita/cambia (también lo usa reiniciar(), abajo).
   var mo = new MutationObserver(function(){
     if (!document.getElementById(canvasId)) {
       canvas = ensureCanvas();
+      resizeCanvas();
       watchContextLoss(canvas);
-      running = false; bootAttempts = 0; boot();
-      boot(); // re-inicializa si lo removieron
+      running = false;
+      boot();
     }
   });
   mo.observe(document.documentElement, { childList: true, subtree: true });
@@ -1000,14 +1006,22 @@ SOFTWARE.
     if (aspectRatio > 1) delta /= aspectRatio;
     return delta;
   }
+  // Un movimiento normal del cursor desplaza el punto unas milésimas. Un salto
+  // enorme (el cursor que entra por el otro lado de la ventana, un cambio de
+  // tamaño) metería tanta fuerza que la simulación se desborda y se queda
+  // negra; se limita el empujón para que eso no pueda pasar.
+  var MAX_DELTA = 0.25;
+  function limitarDelta (d) { return Math.max(-MAX_DELTA, Math.min(MAX_DELTA, d)); }
+
   function updatePointerMoveData (pointer, posX, posY) {
     pointer.prevTexcoordX = pointer.texcoordX;
     pointer.prevTexcoordY = pointer.texcoordY;
     pointer.texcoordX = posX / canvas.width;
     pointer.texcoordY = 1.0 - posY / canvas.height;
-    pointer.deltaX = correctDeltaX(pointer.texcoordX - pointer.prevTexcoordX);
-    pointer.deltaY = correctDeltaY(pointer.texcoordY - pointer.prevTexcoordY);
-    pointer.moved = Math.abs(pointer.deltaX) > 0 || Math.abs(pointer.deltaY) > 0;
+    pointer.deltaX = limitarDelta(correctDeltaX(pointer.texcoordX - pointer.prevTexcoordX));
+    pointer.deltaY = limitarDelta(correctDeltaY(pointer.texcoordY - pointer.prevTexcoordY));
+    // Antes de arrancar sólo se registra dónde está el cursor; pintar, no.
+    pointer.moved = running && (Math.abs(pointer.deltaX) > 0 || Math.abs(pointer.deltaY) > 0);
   }
   function updatePointerUpData (pointer) { pointer.down = false; }
 
@@ -1157,15 +1171,29 @@ SOFTWARE.
     drawDisplay(fbo, width, height);
   }
 
-  function frame() {
+  var ultimoFrame = 0;
+  // Cada arranque abre una "generación" nueva. Así, tras un reinicio, el cuadro
+  // que el ciclo anterior ya tenía pedido no sigue corriendo junto al nuevo.
+  var generacion = 0;
+
+  function frame(gen) {
+    if (gen !== generacion) return;
     if (!running || (gl && gl.isContextLost && gl.isContextLost())) return;
-    var dt = calcDeltaTime();
-    if (resizeCanvas()) initFramebuffers();
-    updateColors(dt);
-    applyInputs();
-    if (!config.PAUSED) step(dt);
-    render(null);
-    requestAnimationFrame(frame);
+    try {
+      var dt = calcDeltaTime();
+      if (resizeCanvas()) initFramebuffers();
+      updateColors(dt);
+      applyInputs();
+      if (!config.PAUSED) step(dt);
+      render(null);
+    } catch (err) {
+      // Un error a mitad de un cuadro cortaba el ciclo y el fondo se quedaba
+      // congelado para siempre. Ahora se vuelve a arrancar con lienzo nuevo.
+      reiniciar();
+      return;
+    }
+    ultimoFrame = Date.now();
+    requestAnimationFrame(function () { frame(gen); });
   }
 
   // Reintenta si el navegador niega el contexto WebGL momentaneamente (proceso
@@ -1186,20 +1214,69 @@ SOFTWARE.
     running = true;
     gl = ref.gl; ext = ref.ext;
 
-    if (isMobile()) { config.DYE_RESOLUTION = 512; }
-    if (!ext.supportLinearFiltering) {
-      config.DYE_RESOLUTION = 512;
-      config.SHADING = false;
-      config.BLOOM = false;
-      config.SUNRAYS = false;
+    try {
+      if (isMobile()) { config.DYE_RESOLUTION = 512; }
+      if (!ext.supportLinearFiltering) {
+        config.DYE_RESOLUTION = 512;
+        config.SHADING = false;
+        config.BLOOM = false;
+        config.SUNRAYS = false;
+      }
+      buildShaders();
+      initProgramsAndFBOs();
+      multipleSplats(parseInt(Math.random() * 20) + 5);
+    } catch (err) {
+      // Contexto perdido o shader que no compiló a la mitad del arranque. Antes
+      // esto dejaba running=true sin animación: el fondo muerto hasta recargar.
+      running = false;
+      if (bootAttempts++ < 12) setTimeout(reiniciar, 250 * bootAttempts);
+      return;
     }
-    buildShaders();
-    initProgramsAndFBOs();
-    multipleSplats(parseInt(Math.random() * 20) + 5);
     lastUpdateTime = Date.now();
     colorUpdateTimer = 0.0;
-    frame();
+    ultimoFrame = Date.now();
+    generacion++;
+    frame(generacion);
   }
+
+  // Arranca de cero con un lienzo nuevo: un contexto WebGL que falló o se
+  // perdió no siempre se recupera, uno nuevo sí. Quitar el lienzo dispara el
+  // MutationObserver del principio, que crea otro y llama a boot().
+  function reiniciar() {
+    running = false;
+    var viejo = document.getElementById(canvasId);
+    if (viejo && viejo.parentNode) {
+      viejo.parentNode.removeChild(viejo);
+    } else {
+      boot();
+    }
+  }
+
+  // Si el fondo no está corriendo, cualquier movimiento o toque lo despierta
+  // (antes había que recargar la página). Como mucho un intento por segundo.
+  var ultimoDespertar = 0;
+  function despertar() {
+    if (running || Date.now() - ultimoDespertar < 1000) return;
+    ultimoDespertar = Date.now();
+    bootAttempts = 0;
+    boot();
+  }
+  ['pointermove', 'pointerdown', 'touchstart', 'keydown'].forEach(function (ev) {
+    window.addEventListener(ev, despertar, { passive: true });
+  });
+  window.addEventListener('pageshow', despertar);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    ultimoFrame = Date.now(); // en segundo plano no hay cuadros: no es un fallo
+    despertar();
+  });
+
+  // Vigilante: si dice estar corriendo pero lleva más de 3 s sin pintar un
+  // cuadro con la pestaña a la vista, algo lo trabó; se reinicia.
+  setInterval(function () {
+    if (document.hidden || !running) return;
+    if (Date.now() - ultimoFrame > 3000) reiniciar();
+  }, 2000);
 
   // Si el navegador pierde el contexto (cambio de GPU, suspension, memoria),
   // preventDefault permite que se pueda restaurar y volvemos a arrancar.
@@ -1215,23 +1292,24 @@ SOFTWARE.
   }
   watchContextLoss(canvas);
 
-  // Arranque cuando la pagina ya cargo y el navegador quedo libre. Compilar
-  // los shaders bloquea el hilo principal varios cientos de ms; hacerlo en
-  // DOMContentLoaded retrasaba el primer pintado y la respuesta a los clics
-  // (TBT de 860 ms en Metodologia). El lienzo es negro mientras tanto, asi que
-  // solo se nota que el fluido aparece un instante despues. Si el contexto
-  // WebGL se niega la primera vez, boot() ya reintenta por su cuenta.
+  // Arranque en cuanto el navegador queda libre tras armar la página (como
+  // mucho medio segundo después). Compilar los shaders bloquea el hilo
+  // principal unos cientos de ms; así no retrasa el primer pintado, pero
+  // tampoco espera a que terminen de bajar todas las imágenes. Si el cursor
+  // se mueve antes, despertar() lo arranca en ese momento.
   function arrancarCuandoLibre() {
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(boot, { timeout: 2000 });
+      window.requestIdleCallback(function () { boot(); }, { timeout: 500 });
     } else {
-      setTimeout(boot, 200);
+      setTimeout(boot, 50);
     }
   }
-  if (document.readyState === 'complete') {
-    arrancarCuandoLibre();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', arrancarCuandoLibre);
   } else {
-    window.addEventListener('load', arrancarCuandoLibre);
+    arrancarCuandoLibre();
   }
+  // Red de seguridad: si al terminar de cargar todavía no corre, otro intento.
+  window.addEventListener('load', despertar);
 
 })();
