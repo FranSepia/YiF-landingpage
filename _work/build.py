@@ -40,7 +40,8 @@ SITIO_ID = DOMINIO + '/#sitio'
 # aquí y corre el script: se actualiza en todo el sitio.
 # --------------------------------------------------------------------------
 EMPRESA = {
-    'nombre': 'Y&iF',
+    'nombre': 'Y&iF',                    # nombre comercial
+    'razon_social': 'Y&F Group',         # como está registrada ante el SAT
     'otros_nombres': ['Why and If', 'Y&F Group'],
     'eslogan': 'Purpose Driven Tech',
     # La definición NO va aquí: se lee del párrafo .yf-home-intro de la home (oculto),
@@ -65,7 +66,8 @@ EMPRESA = {
     # pesa para que los buscadores unan el sitio con esos perfiles.
     'perfiles': [],
     'temas': [
-        'Inteligencia artificial', 'Automatización de procesos',
+        'Inteligencia artificial', 'Agentes de inteligencia artificial',
+        'Automatización robótica de procesos (RPA)', 'Automatización de procesos',
         'Desarrollo de software a la medida', 'Transformación digital',
         'Gestión de la innovación', 'Dirección de proyectos tecnológicos',
         'Validación de productos digitales', 'Patentes y propiedad intelectual',
@@ -74,7 +76,8 @@ EMPRESA = {
 }
 
 TEMAS_EN = [
-    'Artificial intelligence', 'Process automation', 'Custom software development',
+    'Artificial intelligence', 'AI agents', 'Robotic process automation (RPA)',
+    'Process automation', 'Custom software development',
     'Digital transformation', 'Innovation management', 'Technology project management',
     'Digital product validation', 'Patents and intellectual property',
     'Market intelligence', 'Executive innovation training',
@@ -280,6 +283,7 @@ def organizacion(lang='es'):
         '@id': ORG_ID,
         'name': e['nombre'],
         'alternateName': e['otros_nombres'],
+        'legalName': e['razon_social'],
         'url': DOMINIO + '/',
         'logo': {'@type': 'ImageObject', 'url': DOMINIO + e['logo'], 'width': 256, 'height': 256},
         'image': DOMINIO + e['imagen'],
@@ -594,6 +598,7 @@ def generar_llms():
          'Y&iF opera bajo el lema "%s": tecnología con propósito y resultados medibles. '
          'Trabaja con %s.' % (e['eslogan'], e['sectores']), '',
          'Datos clave:', '',
+         '- Nombre comercial: %s · Razón social: %s' % (e['nombre'], e['razon_social']),
          '- Sede: Ciudad de México (Miguel Hidalgo), México',
          '- Mercado: México y Latinoamérica',
          '- Idiomas: español e inglés',
@@ -630,7 +635,8 @@ def generar_llms():
          '> ' + definicion(), '',
          'Fuente: %s · Actualizado: %s · Generado a partir de las páginas publicadas.' % (url('/'), hoy), '',
          '## Quiénes somos', '',
-         '- Nombre: %s (también %s)' % (e['nombre'], ', '.join(e['otros_nombres'])),
+         '- Nombre comercial: %s (Why and If)' % e['nombre'],
+         '- Razón social: %s' % e['razon_social'],
          '- Lema: ' + e['eslogan'],
          '- Sede: ' + direccion,
          '- Mercado: México y Latinoamérica',

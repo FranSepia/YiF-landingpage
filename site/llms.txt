@@ -1,11 +1,12 @@
 # Y&iF (Why and If)
 
-> Y&iF (Why and If) es una consultoría de innovación tecnológica e inteligencia artificial con sede en la Ciudad de México que ayuda a empresas, gobierno y sector educativo de México y LATAM a diseñar, validar y construir soluciones digitales —automatización con IA, software a la medida y transformación digital— con su metodología propia, WIAM.
+> Y&iF (Why and If) es una consultoría de inteligencia artificial e innovación tecnológica con sede en la Ciudad de México. Desarrolla agentes de IA, automatización robótica de procesos (RPA) y software a la medida para empresas, gobierno y sector educativo de México y LATAM, con su metodología propia, WIAM.
 
 Y&iF opera bajo el lema "Purpose Driven Tech": tecnología con propósito y resultados medibles. Trabaja con sector público, corporativo y empresas, sector educativo, y tecnología y startups.
 
 Datos clave:
 
+- Nombre comercial: Y&iF · Razón social: Y&F Group
 - Sede: Ciudad de México (Miguel Hidalgo), México
 - Mercado: México y Latinoamérica
 - Idiomas: español e inglés
