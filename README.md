@@ -36,16 +36,24 @@ Duplicado Landing Page Y&iF/
 │   │       ├── y-and-if/                 (3 img + 2 video)
 │   │       └── humberto-gonzalez-olmos/  (16 img + 2 video)
 │   │   └── contacto/js/      ← contact-form.js (envía el form a /api/contact)
+│   ├── en/                   ← versión en inglés, GENERADA por _work/build.py (no editar)
+│   ├── 404.html              ← página de error (el Worker la sirve con status 404)
 │   ├── favicon.ico
-│   ├── robots.txt
-│   ├── sitemap.xml
-│   ├── vercel.json           ← URLs limpias + redirects de las tarjetas
-│   └── netlify.toml
+│   ├── site.webmanifest
+│   ├── robots.txt            ← permite buscadores y bots de IA de forma explícita
+│   ├── sitemap.xml           ← GENERADO por _work/build.py
+│   ├── llms.txt              ← resumen del sitio para asistentes de IA (GENERADO)
+│   ├── llms-full.txt         ← todo el contenido en Markdown (GENERADO)
+│   ├── _headers              ← caché y cabeceras de seguridad (Cloudflare)
+│   ├── .assetsignore         ← lo que está en site/ pero no se publica
+│   ├── vercel.json           ← URLs limpias + redirects de las tarjetas (no se publica)
+│   └── netlify.toml          ← (no se publica)
 ├── worker/                   ← el Worker que sirve el sitio (NO va dentro de site/)
 │   ├── index.js              ← reparte: assets estáticos vs /api/contact
 │   └── contact.js            ← guarda el lead en D1 + avisa por correo
 ├── wrangler.jsonc            ← config del Worker: assets, binding D1, variables
 ├── _work/                    ← material de trabajo (NO se despliega)
+│   ├── build.py              ← regenera inglés, JSON-LD, llms, sitemap… (ver "SEO, GEO e idiomas")
 │   ├── localize.py           ← baja el sitio original y genera /site (plano)
 │   ├── reorganize.py         ← reparte /site/assets en carpetas por página
 │   ├── serve_nocache.py      ← servidor local sin caché
@@ -88,27 +96,94 @@ compartido. Una página solo estrena carpeta cuando tiene algún archivo suyo.
 2. Crea `site/assets/tarjetas/<nombre>/img/` (y `video/` si hace falta) con sus archivos.
 3. Dentro del HTML las rutas van con `../` porque el archivo está un nivel abajo:
    `../assets/tarjetas/<nombre>/img/foto.jpg`, `../assets/shared/css/…`.
-4. Agrégala al `sitemap.xml`. Queda publicada en `https://tu-dominio/tarjetas/<nombre>`.
+4. Agrégala a `PAGINAS` en `_work/build.py` y corre `python _work/build.py`
+   (así entra al sitemap con su JSON-LD). Queda publicada en `https://tu-dominio/tarjetas/<nombre>`.
 
 ---
 
 ## ▶️ Correr en local
 
 ```bash
+npx wrangler dev                   # http://127.0.0.1:8787/
+```
+
+Es lo más fiel a producción: corre el mismo Worker (redirecciones, 404 real,
+`/api/contact`) y aplica `_headers`. Ojo: si `.dev.vars` tiene `RESEND_API_KEY`,
+enviar el formulario en local manda un correo de verdad.
+
+Para sólo mirar el diseño, sin Worker:
+
+```bash
 python _work/serve_nocache.py      # http://127.0.0.1:8124/
 ```
 
-Este es el recomendado: manda cabeceras `no-cache`, así ves los cambios sin
-tener que forzar recarga. Alternativa, desde la carpeta `site/`:
-
-```bash
-python -m http.server 8123
-```
-
-Abre **http://127.0.0.1:8123/**. (Cualquier servidor estático sirve: `npx serve`, etc.)
+Manda cabeceras `no-cache` (ves los cambios sin forzar recarga) y resuelve las
+URLs limpias (`/soluciones` → `soluciones.html`) igual que Cloudflare. Ya **no**
+sirve `python -m http.server`: los enlaces del sitio son `/soluciones`,
+`/contacto`… y ese servidor no sabe quitarles el `.html`.
 
 > Ábrelo con un servidor, **no** con doble-clic (`file://`), porque las fuentes, el
 > WebGL y algunas rutas relativas no cargan bien bajo `file://`.
+
+---
+
+## 🔎 SEO, GEO e idiomas
+
+### Después de editar cualquier página: `python _work/build.py`
+
+Varias piezas del sitio se **generan** a partir de las páginas en español. Corre
+esto antes de cada commit (no instala nada, sólo usa Python y git):
+
+```bash
+python _work/build.py
+```
+
+| Genera | A partir de |
+|---|---|
+| `site/en/*.html` — la versión en inglés | cada página en español y sus `data-en` |
+| JSON-LD (datos estructurados) en el `<head>` de cada página | `EMPRESA` en `build.py` + títulos, descripciones y soluciones del HTML |
+| Texto de las 6 órbitas en Metodología (oculto a la vista) | el `<script>` del diagrama (`ORBITS_ES` / `ORBITS_EN`) |
+| `?v=<huella>` en cada CSS/JS | el contenido del archivo |
+| `llms.txt`, `llms-full.txt` | todo lo anterior |
+| `sitemap.xml` con `lastmod` y `hreflang` | `PAGINAS` en `build.py` + git |
+
+**Nunca edites `site/en/`, `sitemap.xml`, `llms.txt` ni `llms-full.txt` a mano**: el
+siguiente build los sobrescribe.
+
+### Textos en inglés
+
+Cada elemento con texto lleva su traducción al lado, en la página en español:
+
+```html
+<h1 class="heading-1-0" data-en="Solutions">Soluciones</h1>
+<meta content="Descripción en español" name="description" data-en-content="English description"/>
+<img alt="Logo" data-en-alt="Logo">          <!-- data-en-<atributo> cambia ese atributo -->
+```
+
+Si agregas texto nuevo y no le pones `data-en`, en `/en/` saldrá en español.
+
+### Datos de la empresa
+
+Nombre, teléfonos, dirección, temas y redes sociales viven en `EMPRESA`, al
+inicio de `_work/build.py`, y de ahí salen al JSON-LD y a `llms.txt`. La
+definición de Y&iF se lee del párrafo bajo el logo de la home
+(`<p class="yf-home-intro">`). **`perfiles` está vacío** hasta tener las URLs
+oficiales (LinkedIn de la empresa, Instagram, Google Business Profile…).
+
+### Caché
+
+`site/_headers` deja imágenes y videos 30 días en el navegador. **Si reemplazas
+una imagen, súbela con otro nombre**; si no, quien ya la vio seguirá viendo la
+vieja. CSS y JS no tienen ese problema: `build.py` les cambia el `?v=`.
+
+### Cloudflare y los bots de IA
+
+`robots.txt` permite a buscadores y asistentes de IA, pero Cloudflare puede
+bloquearlos antes de que lleguen. En octubre de 2026 el sitio respondía **403 a
+GPTBot y ClaudeBot** (y a CCBot, Bytespider, Amazonbot), aunque dejaba pasar a
+OAI-SearchBot, ChatGPT-User, Claude-SearchBot, PerplexityBot, Googlebot y
+Bingbot. Eso se controla en el dashboard, no en el código: ver
+*Security → Settings → Bot traffic / AI Crawl Control*.
 
 ---
 
@@ -231,8 +306,8 @@ Si quieres que alguna sea accesible con un botón/enlace (en el menú, el pie, o
 
 ## ⚠️ Notas de fidelidad (comportamiento idéntico al original)
 
-- **`GET /LDR_LLL1_0.png → 404` en consola**: es la textura de *dithering* que el script de acuarela intenta cargar. **El sitio original también da 404** en ese archivo, así que el efecto se ve exactamente igual (el sim corre sin esa textura). No es un error de la copia.
-- **`[splide] null is invalid` en la home**: la home ejecuta el init de Splide aunque no tiene carrusel. **El original hace lo mismo**; es inofensivo.
+- **Textura `LDR_LLL1_0.png`**: el script de acuarela pedía esa textura de *dithering*, que nunca existió (tampoco en el original) y daba 404 en consola. Al fallar se quedaba con una textura blanca de 1×1; ahora se le pasa esa misma textura directo (un PNG en `data:`), así que se ve igual y sin error.
+- **Splide** sólo se carga en Soluciones (la única página con carrusel); antes iba en todas y en algunas tiraba `[splide] null is invalid`.
 - **CMS dinámico**: no se detectaron *Collection Lists* con contenido paginado/dinámico. Las páginas se capturaron como **snapshot estático** del HTML publicado, por lo que cualquier contenido que en Webflow fuera de CMS queda "congelado" (no se actualiza solo). Si en el futuro necesitas contenido editable, habría que montar un CMS aparte.
 
 ---
