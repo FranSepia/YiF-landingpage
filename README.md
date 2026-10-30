@@ -23,9 +23,9 @@ Duplicado Landing Page Y&iF/
 │   │   └── humberto-gonzalez-olmos.html  ← /tarjetas/humberto-gonzalez-olmos
 │   ├── assets/               ← organizados POR PÁGINA
 │   │   ├── shared/           ← lo que usan varias páginas
-│   │   │   ├── css/   (8)  hojas de estilo
+│   │   │   ├── css/   (9)  hojas de estilo (incluye tarjetas.css)
 │   │   │   ├── fonts/ (20) woff2 de Montserrat (variable) y Bitter
-│   │   │   ├── js/    (7)  Webflow, jQuery, Splide, Swiper
+│   │   │   ├── js/    (8)  Webflow, jQuery, Splide, Swiper, tarjetas-footer.js
 │   │   │   ├── img/   (21) logos, favicons, OG, badge, iconos comunes
 │   │   │   └── docs/  (1)  Aviso de Privacidad (PDF)
 │   │   ├── home/             ← solo index.html      (4 img + watercolor-home.js)
@@ -96,6 +96,9 @@ compartido. Una página solo estrena carpeta cuando tiene algún archivo suyo.
 2. Crea `site/assets/tarjetas/<nombre>/img/` (y `video/` si hace falta) con sus archivos.
 3. Dentro del HTML las rutas van con `../` porque el archivo está un nivel abajo:
    `../assets/tarjetas/<nombre>/img/foto.jpg`, `../assets/shared/css/…`.
+   Deja los dos archivos comunes de las tarjetas: `assets/shared/css/tarjetas.css`
+   y `assets/shared/js/tarjetas-footer.js` (ver abajo). Si el footer de la tarjeta
+   nueva no usa la clase `section-28` de Webflow, márcalo con `data-tarjeta-footer`.
 4. Agrégala a `PAGINAS` en `_work/build.py` y corre `python _work/build.py`
    (así entra al sitemap con su JSON-LD). Queda publicada en `https://tu-dominio/tarjetas/<nombre>`.
 
@@ -291,6 +294,23 @@ Las `og:image` apuntan a `https://www.why-and-if.solutions/...`. Si despliegas p
 - **Home: efecto de acuarela reactivo al *hover*.** En el sitio original, en la home el efecto solo se pintaba al **hacer clic**; en las demás pantallas se pinta al **pasar el cursor**. Se unificó: ahora la home también reacciona al mover el cursor (sin clic), igual que el resto. El cambio vive en `assets/home/js/watercolor-home.js` (copia dedicada del script con el `mousemove` habilitado para hover) y `index.html` la referencia. No afecta a `soluciones`/`soluciones-copy`, que conservan su propio script. El clic sigue funcionando igual.
 
 - **Soluciones: carrusel ajustado.** (1) La **tarjeta central** (activa) se muestra un poco más grande — factor ajustable en el `<style id="yif-custom">` de `soluciones.html`, variable `--yif-active-scale` (1.16 = +16 %). (2) Al hacer **clic en una tarjeta lateral**, el carrusel se **centra en ella** (opción `slideToClickedSlide: true` de Swiper). Ambos cambios están en `soluciones.html`.
+
+- **Tarjetas digitales: footer y perímetros.** Las dos tarjetas cargan
+  `assets/shared/css/tarjetas.css` y `assets/shared/js/tarjetas-footer.js`.
+
+  (1) *Footer*. El layout de las tarjetas viene de Webflow y está armado con
+  posiciones absolutas, y el footer estaba pegado al **fondo de la ventana**
+  (`bottom: 0`), no al final del contenido: en una pantalla baja el fondo de la
+  ventana cae por encima de los paneles y el footer se les montaba encima.
+  `tarjetas-footer.js` mide dónde termina de verdad la tarjeta y lo coloca
+  debajo, así que sólo se ve al bajar; si en la pantalla sobra alto, se queda al
+  pie como antes y no abre un hueco. Constantes al inicio del script:
+  `SEPARACION` (aire entre la tarjeta y el footer) y `MARGEN` (aire debajo).
+
+  (2) *Perímetros*. Cada panel traía su propio borde: el de texto con una línea
+  de 1 px y los demás con el borde en 0, así que se veían más apagados. Ahora
+  los tres paneles de cada tarjeta comparten el borde del panel de texto, en las
+  variables `--td-borde`, `--td-radio` y `--td-sombra` de `tarjetas.css`.
 
 ### Páginas sin enlace en el menú (cómo verlas)
 Estas páginas existen pero no tienen botón en la navegación (igual que en el original). Se abren por URL directa:

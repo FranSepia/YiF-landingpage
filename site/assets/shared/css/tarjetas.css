@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Tarjetas digitales (site/tarjetas/*.html)
+
+   Ajustes propios sobre el CSS exportado de Webflow. Se carga después de él,
+   así que gana con la misma especificidad y no hace falta !important.
+   ========================================================================== */
+
+:root {
+  /* Perímetro común de todos los rectángulos de la tarjeta. Son los valores
+     que ya tenía el panel de texto ("catalizamos proyectos que transforman
+     realidades con propósito"), que es el que se tomó como referencia. */
+  --td-borde: 1px solid #ffffff24;
+  --td-radio: 24px;
+  --td-sombra: 0 2px 14px #0003, inset 0 1px 0 1px #ffffff0a;
+}
+
+/* --------------------------------------------------------------------------
+   1. Un solo perímetro para todos los paneles
+   --------------------------------------------------------------------------
+   Antes cada panel traía su propio borde: el de texto con una línea de 1px
+   (#ffffff24) y los otros con el borde en 0, así que se veían más apagados. */
+
+.container-39,     /* Y&iF · panel del video         */
+.container-40,     /* Y&iF · panel de texto          */
+.container-44.hgo, /* HGO  · panel del video         */
+.container-45,     /* HGO  · panel de texto          */
+.icon-row.hgo {    /* ambas · columna de botones     */
+  border: var(--td-borde);
+  border-radius: var(--td-radio);
+  box-shadow: var(--td-sombra);
+}
+
+/* El borde del panel de texto lo dibujaba el div de adentro, que mide y se
+   apoya exactamente igual que su contenedor. Si lo dejáramos, la línea se
+   pintaría dos veces y ese panel seguiría viéndose más claro que los demás. */
+.panel_rigth-2,
+.div-block-54.hgo {
+  border: 0;
+  box-shadow: none;
+}
+
+/* El video y el degradado que lleva encima quedan por dentro del borde. */
+.div-block-56,
+.div-block-59.hgo,
+.div-block-69.hgo,
+.div-block-72.hgo {
+  border-radius: calc(var(--td-radio) - 1px);
+}
+
+/* --------------------------------------------------------------------------
+   2. Footer
+   --------------------------------------------------------------------------
+   El footer vivía anclado al fondo de la ventana (position:absolute con
+   bottom:0). Como toda la tarjeta está posicionada en absoluto, en pantallas
+   bajas el fondo de la ventana queda por encima de los paneles y el footer se
+   les montaba encima. tarjetas-footer.js lo recoloca siempre debajo de todo
+   el contenido; esto es sólo el acabado. */
+
+.section-28 {
+  height: auto;
+  padding-bottom: 8px;
+}
