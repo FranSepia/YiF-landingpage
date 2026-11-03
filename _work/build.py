@@ -137,6 +137,16 @@ def leer(ruta):
 def escribir(ruta, contenido):
     destino = os.path.join(SITE, ruta)
     os.makedirs(os.path.dirname(destino), exist_ok=True)
+    # Si el contenido no cambió, el archivo no se toca. Reescribirlo igual le
+    # cambia la fecha, git lo pasa a "modificado" y entonces
+    # ultima_modificacion() le pone hoy: cada corrida dejaba el sitemap
+    # diciendo que TODAS las páginas cambiaron hoy, aunque ninguna lo hubiera
+    # hecho. Se compara normalizando CRLF porque en Windows el checkout deja
+    # los finales de línea nativos.
+    if os.path.exists(destino):
+        with open(destino, encoding='utf-8', newline='') as f:
+            if f.read().replace('\r\n', '\n') == contenido:
+                return
     with open(destino, 'w', encoding='utf-8', newline='\n') as f:
         f.write(contenido)
 

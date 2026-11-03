@@ -40,6 +40,28 @@
 /assets/shared/docs/*
   Cache-Control: public, max-age=86400
 
+# ─── Brightstar Game 80s (pieza de campaña, temporal) ────────────────────────
+# Al retirar el juego, borrar este bloque junto con site/Brightstar-Game-80s/.
+#
+# No se indexa: se llega por el enlace, no por una búsqueda. Se hace con
+# X-Robots-Tag y NO con un Disallow en robots.txt, porque un Disallow impide
+# que el buscador lea la página y entonces nunca ve el noindex: la URL puede
+# seguir saliendo en los resultados si alguien la enlaza. Para que no aparezca
+# hay que dejarlo rastrear y decirle que no la indexe.
+# Las dos rutas: el enrutador de assets sirve la página en /Brightstar-Game-80s
+# (sin barra final) y /Brightstar-Game-80s/* no la alcanza.
+/Brightstar-Game-80s
+  X-Robots-Tag: noindex, nofollow
+
+/Brightstar-Game-80s/*
+  X-Robots-Tag: noindex, nofollow
+
+# El nombre del bundle lleva huella de contenido (index-<hash>.js), así que al
+# recompilar cambia la URL y no hay que esperar a que venza la caché. Los
+# sprites no la llevan: si reemplazas uno, súbelo con otro nombre.
+/Brightstar-Game-80s/assets/*
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
+
 # Seguridad básica para todo el sitio. Sin Content-Security-Policy a
 # propósito: Webflow deja scripts en línea en todas las páginas y una CSP
 # estricta los rompería.

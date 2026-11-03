@@ -25,3 +25,9 @@ node_modules/
 
 # Secretos de wrangler dev (nunca al repo)
 .dev.vars
+
+# El juego de campaña tiene su propio repo (ver jueguito/DESPLIEGUE.md). Acá
+# se versiona solo lo publicado, site/Brightstar-Game-80s/, que es su build.
+# Sin esta línea git lo agrega como submódulo roto: un puntero a un commit que
+# nadie puede resolver al clonar la landing.
+jueguito/

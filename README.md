@@ -18,6 +18,7 @@ Duplicado Landing Page Y&iF/
 │   ├── soluciones-copy.html  ← /soluciones-copy
 │   ├── why-innovation-atomic-model.html
 │   ├── aliados-expertos.html
+│   ├── Brightstar-Game-80s/  ← juego de campaña, TEMPORAL (ver jueguito/DESPLIEGUE.md)
 │   ├── tarjetas/             ← todas las tarjetas digitales viven aquí
 │   │   ├── y-and-if.html                 ← /tarjetas/y-and-if
 │   │   └── humberto-gonzalez-olmos.html  ← /tarjetas/humberto-gonzalez-olmos
@@ -312,11 +313,24 @@ Las `og:image` apuntan a `https://www.why-and-if.solutions/...`. Si despliegas p
   los tres paneles de cada tarjeta comparten el borde del panel de texto, en las
   variables `--td-borde`, `--td-radio` y `--td-sombra` de `tarjetas.css`.
 
+- **Brightstar Game 80s: juego de campaña (temporal).** Vive en
+  `site/Brightstar-Game-80s/` y se publica en
+  `https://www.why-and-if.solutions/Brightstar-Game-80s`. Es un build de Vite
+  que se compila aparte, en la carpeta `jueguito/` (fuera de `site/`, así que
+  el código fuente no se publica). **No tiene enlace desde ninguna página** y
+  **no se indexa**: se llega solo con la URL. El ranking vive en Supabase.
+
+  Esto es una pieza de campaña que se retira en unas semanas. Las instrucciones
+  para recompilarlo y para quitarlo están en
+  [`jueguito/DESPLIEGUE.md`](jueguito/DESPLIEGUE.md); toca `site/_headers` y
+  `wrangler.jsonc`, y las dos cosas están anotadas ahí.
+
 ### Páginas sin enlace en el menú (cómo verlas)
 Estas páginas existen pero no tienen botón en la navegación (igual que en el original). Se abren por URL directa:
 
 | Página | En local | Desplegada |
 |---|---|---|
+| Brightstar Game 80s (juego, temporal) | `npx wrangler dev` → `http://127.0.0.1:8787/Brightstar-Game-80s` | `https://tu-dominio/Brightstar-Game-80s` |
 | Tarjeta digital (empresa, Y&iF) | `http://127.0.0.1:8123/tarjetas/y-and-if.html` | `https://tu-dominio/tarjetas/y-and-if` |
 | Tarjeta digital — Humberto | `http://127.0.0.1:8123/tarjetas/humberto-gonzalez-olmos.html` | `https://tu-dominio/tarjetas/humberto-gonzalez-olmos` |
 | Soluciones (copia) | `http://127.0.0.1:8123/soluciones-copy.html` | `https://tu-dominio/soluciones-copy` |

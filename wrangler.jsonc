@@ -18,7 +18,10 @@
   "assets": {
     "directory": "./site",
     "binding": "ASSETS",
-    "run_worker_first": ["/*", "!/assets/*"]
+    // Brightstar-Game-80s es el juego de campaña: sus sprites y su bundle
+    // tampoco necesitan pasar por el Worker. Al retirar el juego, quitar esta
+    // excepción. (Ver jueguito/DESPLIEGUE.md, "Cómo quitarlo".)
+    "run_worker_first": ["/*", "!/assets/*", "!/Brightstar-Game-80s/assets/*"]
   },
 
   // Deja los console.error del formulario visibles en el dashboard
