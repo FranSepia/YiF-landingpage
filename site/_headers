@@ -62,9 +62,26 @@
 /Brightstar-Game-80s/assets/*
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 
-# Seguridad básica para todo el sitio. Sin Content-Security-Policy a
-# propósito: Webflow deja scripts en línea en todas las páginas y una CSP
-# estricta los rompería.
+# Seguridad básica para todo el sitio.
+#
+# La CSP va recortada a propósito. Webflow deja scripts en línea en todas las
+# páginas, así que un `script-src` estricto las rompe y por eso no está. Pero
+# las cuatro directivas que sí están no miran los scripts y no rompen nada;
+# quedarse sin ninguna CSP por culpa de una directiva que no se puede poner era
+# tirar las otras cuatro al mismo tiempo.
+#
+#   frame-ancestors 'self' — nadie puede meter el sitio dentro de un iframe
+#     ajeno (el truco del clickjacking). Es la versión moderna del
+#     X-Frame-Options de abajo, que los navegadores nuevos ya ignoran cuando
+#     hay CSP.
+#   form-action 'self' — un formulario de este sitio sólo puede postear a este
+#     sitio. Los dos que hay van a /api/contact; comprobado antes de ponerlo.
+#   base-uri 'self' — nadie puede inyectar un <base> que redirija todas las
+#     rutas relativas (scripts incluidos) a otro dominio. El sitio no usa
+#     <base> en ninguna página.
+#   object-src 'none' — sin <object> ni <embed>, que son plugins viejos y pura
+#     superficie de ataque. El sitio tampoco los usa.
+#
 # HSTS sin includeSubDomains: sólo obliga HTTPS en este dominio, no en
 # subdominios que algún día pudieran no tener certificado.
 /*
@@ -72,4 +89,5 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'
   Permissions-Policy: camera=(), microphone=(), geolocation=()
