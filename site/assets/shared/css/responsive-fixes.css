@@ -938,15 +938,19 @@ body.home .columns-4::after {
    que ese texto no aparecía NUNCA: la tarjeta se quedaba con el título y nada
    más.
 
-   Con (hover: none) esto se aplica sólo a pantallas táctiles; en escritorio el
-   comportamiento sigue siendo el de siempre (aparece al pasar el cursor).
+   Las dos condiciones van con coma (o sea: cualquiera de las dos basta).
+   (hover: none) cubre el teléfono y la tablet de verdad. (max-width: 767px)
+   cubre el otro caso en el que tampoco sirve el :hover: una ventana de
+   escritorio angosta o la "vista de celular" del navegador sin emulación
+   táctil, donde el cursor sigue existiendo y la tarjeta se quedaba otra vez
+   sin subtítulo. Arriba de 767px con ratón todo sigue igual que siempre.
 
    Los selectores llevan .swiper y .swiper-slide de más a propósito: el HTML de
    la página trae, DESPUÉS de esta hoja, un
    ".swiper-slide-active .slide-gradient{background:none!important}". Con la
    misma especificidad ganaría esa por ir más abajo, y el velo oscuro no se
    pintaría: el texto blanco quedaría ilegible sobre la imagen clara. */
-@media (hover: none) {
+@media (hover: none), (max-width: 767px) {
   .swiper .swiper-slide.swiper-slide-active .slide-content_text-wrapper {
     opacity: 1;
   }
@@ -982,8 +986,8 @@ body.home .columns-4::after {
 
 /* El subtítulo de la tarjeta usa --title-active (#456376, azul oscuro), que se
    lee bien sobre la imagen clara pero desaparece sobre el velo negro que se
-   pone al abrir la tarjeta en táctil. */
-@media (hover: none) {
+   pone al abrir la tarjeta en táctil. Misma pareja de condiciones que arriba. */
+@media (hover: none), (max-width: 767px) {
   .swiper .swiper-slide.swiper-slide-active .slide-content_text-wrapper h3 {
     color: #fff !important;
   }

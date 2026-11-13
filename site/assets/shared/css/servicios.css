@@ -3,15 +3,38 @@
    /soluciones. Mismo lenguaje que el resto del sitio: fondo negro con fluido,
    Montserrat y paneles de vidrio como la barra de navegación. */
 
+/* La columna de contenido mide como mucho 1000px, pero es hija de
+   .page_wrap_seccion, que es un flex en columna: sin márgenes automáticos el
+   bloque se quedaba pegado al borde izquierdo y en un monitor ancho dejaba
+   900px de vacío a la derecha. Con `auto` a los lados queda centrada. */
 .yf-servicio {
   position: relative;
   z-index: 2;
   box-sizing: border-box;
+  width: 100%;
   max-width: 1000px;
-  margin: 28px 0 0;
+  margin: 28px auto 0;
   padding: 0 clamp(1rem, 4vw, 40px) 80px;
   color: #fff;
   font-family: Montserrat, sans-serif;
+}
+
+/* El H1 de estas páginas vive fuera de .yf-servicio y ocupa todo el ancho
+   (responsive-fixes.css le pone un margen lateral fijo). Centrado el cuerpo,
+   el título se quedaba solo allá a la izquierda. Aquí se le da la misma
+   columna y el mismo respiro lateral que a los paneles, así que arranca
+   exactamente donde arranca el texto de abajo.
+
+   Hace falta ganar en especificidad (dos clases) porque responsive-fixes.css
+   se carga después de esta hoja. */
+body.yf-servicio-pagina .header-t {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 4vw, 40px);
+  padding-right: clamp(1rem, 4vw, 40px);
 }
 
 .yf-servicio-intro {
